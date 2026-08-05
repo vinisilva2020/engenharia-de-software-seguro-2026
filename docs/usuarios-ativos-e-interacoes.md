@@ -14,4 +14,4 @@ Cada perfil possui permissões específicas e deve acessar somente as informaç�
 | Atendente de suporte | Pessoa responsável por auxiliar os usuários             | Consultar pedidos, responder mensagens, registrar reclamações, processar reembolsos e solucionar problemas          |
 | Administrador        | Responsável pelo gerenciamento da plataforma            | Gerenciar usuários, estabelecimentos, entregadores, pedidos, avaliações e configurações do sistema                  |
 
-Cada perfil tenha acesso limitado somente às informações necessárias para desempenhar suas funções. 
+Cada perfil tem acesso limitado somente às informações necessárias para desempenhar suas funções. 
