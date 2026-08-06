@@ -1,5 +1,9 @@
 # Justificativa da escolha do sistema
 
+O sistema escolhido foi um sistema de delivery, devido à sua ampla utilização e à complexidade das interações entre os diferentes atores envolvidos. Esse domínio conta com uma estrutura hierárquica de administração, composta por empresas responsáveis pela oferta dos serviços, funcionários que gerenciam as operações e clientes que realizam pedidos, cada um com diferentes níveis de acesso, permissões e responsabilidades.
+
+Essas características tornam o sistema um cenário adequado para a aplicação dos conceitos de Engenharia de Software Seguro, pois permitem analisar diferentes requisitos de segurança, identificar potenciais vulnerabilidades e desenvolver casos de abuso que representam possíveis ataques ou usos indevidos do sistema. Além disso, é possível avaliar mecanismos de autenticação, autorização, controle de acesso, proteção de dados sensíveis e garantia da confidencialidade, integridade e disponibilidade das informações processadas pela aplicação.
+
 
 # Descrição do sistema
 
