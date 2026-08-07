@@ -21,5 +21,6 @@
 | T17 | Elevation of Privilege  | Painel administrativo    | Um cliente explora uma vulnerabilidade e obtém permissões administrativas.                                                        | Alteração de preços, exclusão de usuários, acesso aos dados e controle do sistema.              |
 | T18 | Elevation of Privilege  | Cadastro das empresas    | Um funcionário comum obtém permissões de administrador da empresa.                                                                | Alteração indevida de cardápios, preços, promoções e pedidos.                                   |
 | T19 | Elevation of Privilege  | Sistema                  | Um usuário comum consegue acessar funcionalidades restritas destinadas aos administradores.                                       | Comprometimento da segurança do sistema e acesso a informações confidenciais.                   |
+| T20 | Elevation of Privilege  | Sistema de pagamento                 |Um atendente de suporte, utilizando seu acesso legítimo, processa reembolsos fraudulentos em conluio com terceiros para pedidos que foram normalmente entregues.                                      | Fraude interna recorrente, prejuízo financeiro direto e difícil detecção, já que a ação é tecnicamente autorizada.                   |
 
 # 6 Casos de abuso
