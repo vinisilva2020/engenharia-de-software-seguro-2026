@@ -24,3 +24,18 @@
 | T20 | Elevation of Privilege  | Sistema de pagamento                 |Um atendente de suporte, utilizando seu acesso legítimo, processa reembolsos fraudulentos em conluio com terceiros para pedidos que foram normalmente entregues.                                      | Fraude interna recorrente, prejuízo financeiro direto e difícil detecção, já que a ação é tecnicamente autorizada.                   |
 
 # 6 Casos de abuso
+| ID | STRIDE ref. | Ator malicioso | Caso de abuso (resumo) | Impacto principal |
+|---|---|---|---|---|
+| A01 | T01 | Atacante externo | Aplica *credential stuffing* (testa credenciais vazadas de outros serviços) contra o login de clientes e assume contas para fazer pedidos com cartão salvo | Prejuízo financeiro à vítima, fraude |
+| A02 | T02 | Concorrente / ex-funcionário | Rouba credenciais de um estabelecimento e altera preços do cardápio para valores absurdos, prejudicando a reputação | Dano à credibilidade, perda de vendas |
+| A03 | T03 | Atacante externo | Assume conta de entregador comprometida, aceita a entrega e desvia o pedido antes de marcá-lo como "entregue" | Furto de mercadoria, prejuízo ao cliente |
+| A04 | T04 | Atacante externo/interno | Explora senha fraca ou phishing contra um administrador e obtém acesso total ao painel | Comprometimento total do sistema |
+| A05 | T05 | Cliente malicioso | Intercepta a requisição de finalização do pedido e altera o preço/quantidade no payload antes de enviar (se a validação for só client-side) | Cobrança incorreta, prejuízo à empresa |
+| A06 | T06 | Atacante externo (MITM) | Intercepta a comunicação com o gateway de pagamento e forja uma resposta de "pagamento aprovado" sem que o valor tenha sido debitado | Fraude financeira |
+| A07 | T08 / T09 | Cliente | Realiza o pedido normalmente, recebe o produto, mas depois solicita reembolso/estorno alegando não ter feito a compra (fraude de chargeback) | Prejuízo financeiro à empresa/plataforma |
+| A08 | T10 | Entregador | Marca o pedido como "entregue" no app sem realizar a entrega de fato, para receber o pagamento | Perda financeira, cliente lesado |
+| A09 | T11 | Atacante externo | Explora uma falha de IDOR no endpoint `/usuarios/{id}` para varrer sequencialmente e extrair dados sensíveis de todos os clientes cadastrados | Vazamento em massa, violação da LGPD |
+| A10 | T13 | Atacante externo | Usa dados vazados de documentos/CPF de entregadores para aplicar golpes de engenharia social (ex: falso suporte pedindo dados bancários) | Fraude, dano reputacional à plataforma |
+| A11 | T15 | Concorrente / extorsionário | Lança ataque de DDoS contra a aplicação durante o horário de pico (almoço/jantar) para causar indisponibilidade | Perda de vendas, indisponibilidade |
+| A12 | T17 | Cliente comum | Manipula o token JWT (ex: altera o campo `role` de "cliente" para "admin") explorando validação de assinatura fraca no backend | Acesso não autorizado a funções administrativas |
+| A13 | T20 | Atendente de suporte | Abusa do próprio acesso legítimo para processar reembolsos fraudulentos em conluio com terceiros | Fraude interna, prejuízo financeiro |
