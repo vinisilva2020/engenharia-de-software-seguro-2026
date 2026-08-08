@@ -24,18 +24,212 @@
 | T20 | Elevation of Privilege  | Sistema de pagamento                 |Um atendente de suporte, utilizando seu acesso legítimo, processa reembolsos fraudulentos em conluio com terceiros para pedidos que foram normalmente entregues.                                      | Fraude interna recorrente, prejuízo financeiro direto e difícil detecção, já que a ação é tecnicamente autorizada.                   |
 
 # 6 Casos de abuso
-| ID | STRIDE ref. | Ator malicioso | Caso de abuso (resumo) | Impacto principal |
-|---|---|---|---|---|
-| A01 | T01 | Atacante externo | Aplica *credential stuffing* (testa credenciais vazadas de outros serviços) contra o login de clientes e assume contas para fazer pedidos com cartão salvo | Prejuízo financeiro à vítima, fraude |
-| A02 | T02 | Concorrente / ex-funcionário | Rouba credenciais de um estabelecimento e altera preços do cardápio para valores absurdos, prejudicando a reputação | Dano à credibilidade, perda de vendas |
-| A03 | T03 | Atacante externo | Assume conta de entregador comprometida, aceita a entrega e desvia o pedido antes de marcá-lo como "entregue" | Furto de mercadoria, prejuízo ao cliente |
-| A04 | T04 | Atacante externo/interno | Explora senha fraca ou phishing contra um administrador e obtém acesso total ao painel | Comprometimento total do sistema |
-| A05 | T05 | Cliente malicioso | Intercepta a requisição de finalização do pedido e altera o preço/quantidade no payload antes de enviar (se a validação for só client-side) | Cobrança incorreta, prejuízo à empresa |
-| A06 | T06 | Atacante externo (MITM) | Intercepta a comunicação com o gateway de pagamento e forja uma resposta de "pagamento aprovado" sem que o valor tenha sido debitado | Fraude financeira |
-| A07 | T08 / T09 | Cliente | Realiza o pedido normalmente, recebe o produto, mas depois solicita reembolso/estorno alegando não ter feito a compra (fraude de chargeback) | Prejuízo financeiro à empresa/plataforma |
-| A08 | T10 | Entregador | Marca o pedido como "entregue" no app sem realizar a entrega de fato, para receber o pagamento | Perda financeira, cliente lesado |
-| A09 | T11 | Atacante externo | Explora uma falha de IDOR no endpoint `/usuarios/{id}` para varrer sequencialmente e extrair dados sensíveis de todos os clientes cadastrados | Vazamento em massa, violação da LGPD |
-| A10 | T13 | Atacante externo | Usa dados vazados de documentos/CPF de entregadores para aplicar golpes de engenharia social (ex: falso suporte pedindo dados bancários) | Fraude, dano reputacional à plataforma |
-| A11 | T15 | Concorrente / extorsionário | Lança ataque de DDoS contra a aplicação durante o horário de pico (almoço/jantar) para causar indisponibilidade | Perda de vendas, indisponibilidade |
-| A12 | T17 | Cliente comum | Manipula o token JWT (ex: altera o campo `role` de "cliente" para "admin") explorando validação de assinatura fraca no backend | Acesso não autorizado a funções administrativas |
-| A13 | T20 | Atendente de suporte | Abusa do próprio acesso legítimo para processar reembolsos fraudulentos em conluio com terceiros | Fraude interna, prejuízo financeiro |
+---
+ 
+### CA01 — Invasão de conta de cliente via credenciais vazadas
+**Ator:** atacante externo.
+**Objetivo:** assumir o controle da conta de um cliente para realizar pedidos com o cartão salvo da vítima.
+**Condições:** o sistema não possui limitação de tentativas de login (rate limiting) nem verificação adicional para acessos suspeitos.
+**Fluxo de abuso:**
+1. O atacante obtém uma lista de credenciais vazadas de outros serviços.
+2. O atacante testa essas credenciais em massa contra o login da plataforma (*credential stuffing*).
+3. O sistema autentica o atacante em contas cujas credenciais coincidem.
+4. O atacante realiza pedidos utilizando o método de pagamento salvo na conta da vítima.
+   
+**Impacto:** prejuízo financeiro à vítima, fraude e perda de confiança na plataforma.
+
+**Categorias STRIDE relacionadas:** Spoofing, Elevation of Privilege.
+ 
+---
+ 
+### CA02 — Alteração indevida do cardápio de um estabelecimento
+**Ator:** concorrente ou ex-funcionário mal-intencionado.
+**Objetivo:** prejudicar a reputação ou os resultados financeiros de um estabelecimento concorrente.
+**Condições:** as credenciais do estabelecimento foram obtidas por phishing, vazamento ou reaproveitamento de senha.
+**Fluxo de abuso:**
+1. O atacante obtém as credenciais de acesso do estabelecimento.
+2. O atacante acessa o painel de gerenciamento do estabelecimento.
+3. O atacante altera preços dos produtos para valores incorretos ou remove itens do cardápio.
+4. Clientes visualizam e reagem às informações incorretas antes da correção.
+
+**Impacto:** dano à credibilidade do estabelecimento, perda de vendas e insatisfação dos clientes.
+
+**Categorias STRIDE relacionadas:** Spoofing, Tampering.
+ 
+---
+ 
+### CA03 — Desvio de pedido por entregador malicioso
+**Ator:** atacante externo que compromete a conta de um entregador, ou o próprio entregador mal-intencionado.
+**Objetivo:** subtrair o produto do pedido sem realizar a entrega.
+**Condições:** o sistema não confirma a entrega por um mecanismo além da marcação manual do entregador (ex: assinatura, código, foto).
+**Fluxo de abuso:**
+1. O atacante acessa ou controla a conta de um entregador.
+2. O entregador aceita a corrida normalmente.
+3. O entregador retira o produto no estabelecimento.
+4. O entregador marca o pedido como "entregue" no aplicativo sem realizar a entrega.
+
+**Impacto:** furto de mercadoria, prejuízo ao cliente e ao estabelecimento, reclamações e possíveis reembolsos indevidos.
+
+**Categorias STRIDE relacionadas:** Spoofing, Repudiation.
+ 
+---
+ 
+### CA04 — Comprometimento do painel administrativo
+**Ator:** atacante externo ou interno.
+**Objetivo:** obter controle total sobre o sistema.
+**Condições:** senha fraca do administrador, ausência de autenticação multifator ou vulnerabilidade explorável por phishing.
+**Fluxo de abuso:**
+1. O atacante identifica um administrador como alvo.
+2. O atacante aplica phishing ou explora senha fraca para obter as credenciais.
+3. O atacante acessa o painel administrativo com privilégios completos.
+4. O atacante altera dados, exclui usuários ou extrai informações do sistema.
+
+**Impacto:** comprometimento completo do sistema, acesso a todos os dados e alterações indevidas em larga escala.
+
+**Categorias STRIDE relacionadas:** Spoofing, Elevation of Privilege, Information Disclosure.
+ 
+---
+ 
+### CA05 — Alteração do valor do pedido antes da confirmação
+**Ator:** cliente mal-intencionado.
+**Objetivo:** pagar um valor menor do que o real pelo pedido.
+**Condições:** a validação de preços e quantidades é feita apenas no lado do cliente (client-side), sem revalidação no servidor.
+**Fluxo de abuso:**
+1. O atacante monta o pedido normalmente pelo aplicativo.
+2. O atacante intercepta a requisição enviada ao servidor antes da confirmação.
+3. O atacante altera o valor, a quantidade ou o produto no payload interceptado.
+4. O servidor aceita os dados alterados sem revalidação.
+
+**Impacto:** cobrança incorreta, prejuízo financeiro à empresa e perda da integridade das informações do pedido.
+
+**Categorias STRIDE relacionadas:** Tampering.
+ 
+---
+ 
+### CA06 — Falsificação de confirmação de pagamento
+**Ator:** atacante externo posicionado entre o cliente e o gateway de pagamento (*man-in-the-middle*).
+**Objetivo:** obter produtos ou serviços sem efetuar o pagamento real.
+**Condições:** a comunicação entre a aplicação e o gateway de pagamento não utiliza validação de integridade suficiente (ex: assinatura de resposta).
+**Fluxo de abuso:**
+1. O atacante intercepta a comunicação entre a aplicação e o gateway de pagamento.
+2. O atacante impede ou altera a requisição real de cobrança.
+3. O atacante forja uma resposta de "pagamento aprovado" para o sistema.
+4. O sistema libera o pedido acreditando que o pagamento foi concluído.
+
+**Impacto:** fraude financeira direta e prejuízo à empresa.
+
+**Categorias STRIDE relacionadas:** Tampering, Spoofing.
+ 
+---
+ 
+### CA07 — Fraude de estorno (chargeback) indevido
+**Ator:** cliente mal-intencionado.
+**Objetivo:** obter o produto e, além disso, reaver o valor pago.
+**Condições:** o processo de contestação de pagamento não exige evidências suficientes por parte do estabelecimento/plataforma.
+**Fluxo de abuso:**
+1. O cliente realiza o pedido normalmente e efetua o pagamento.
+2. O cliente recebe o produto ou serviço integralmente.
+3. O cliente solicita reembolso ou aciona a operadora do cartão alegando não ter realizado a compra.
+4. A plataforma ou o estabelecimento arca com o prejuízo do estorno.
+
+**Impacto:** prejuízo financeiro recorrente à empresa e à plataforma, dificuldade de responsabilização sem registros de auditoria adequados.
+
+**Categorias STRIDE relacionadas:** Repudiation.
+ 
+---
+ 
+### CA08 — Confirmação falsa de entrega
+**Ator:** entregador mal-intencionado.
+**Objetivo:** receber o pagamento pela entrega sem realizá-la de fato.
+**Condições:** a confirmação da entrega depende exclusivamente da marcação feita pelo próprio entregador no aplicativo.
+**Fluxo de abuso:**
+1. O entregador aceita a corrida e retira o pedido.
+2. O entregador não realiza a entrega ao destinatário.
+3. O entregador marca o status como "entregue" no aplicativo.
+4. O sistema processa o pagamento da entrega normalmente.
+
+**Impacto:** perda financeira, cliente lesado e dificuldade de apuração dos fatos sem evidência de entrega.
+
+**Categorias STRIDE relacionadas:** Repudiation.
+ 
+---
+ 
+### CA09 — Extração em massa de dados pessoais de clientes
+**Ator:** atacante externo ou usuário autenticado mal-intencionado.
+**Objetivo:** coletar dados pessoais (CPF, telefone, endereço) de todos os clientes cadastrados.
+**Condições:** o endpoint de consulta de usuários não verifica se o identificador solicitado pertence ao usuário autenticado (falha de autorização a nível de objeto — IDOR).
+**Fluxo de abuso:**
+1. O atacante autentica-se com uma conta válida qualquer.
+2. O atacante identifica que o endpoint aceita um identificador sequencial na URL.
+3. O atacante escreve um script que percorre os identificadores em sequência.
+4. O sistema retorna os dados pessoais de cada cliente sem validar a autorização.
+
+**Impacto:** vazamento em massa de dados pessoais, violação da LGPD e exposição dos clientes a golpes.
+
+**Categorias STRIDE relacionadas:** Information Disclosure, Elevation of Privilege.
+ 
+---
+ 
+### CA10 — Engenharia social com dados vazados de entregadores
+**Ator:** atacante externo.
+**Objetivo:** aplicar golpes contra entregadores utilizando dados pessoais obtidos indevidamente.
+**Condições:** dados como CPF, telefone e documentos de entregadores foram expostos por falha de proteção no armazenamento ou na transmissão.
+**Fluxo de abuso:**
+1. O atacante obtém dados pessoais de entregadores por meio de vazamento do sistema.
+2. O atacante utiliza essas informações para se passar por um contato confiável (ex: suporte da plataforma).
+3. O atacante contata o entregador solicitando dados bancários ou credenciais.
+4. O entregador, acreditando ser um contato legítimo, fornece as informações solicitadas.
+
+**Impacto:** fraude financeira contra o entregador e dano reputacional à plataforma.
+
+**Categorias STRIDE relacionadas:** Information Disclosure, Spoofing.
+ 
+---
+ 
+### CA11 — Indisponibilidade da plataforma em horário de pico
+**Ator:** concorrente mal-intencionado ou extorsionário.
+**Objetivo:** tornar a plataforma indisponível durante o período de maior movimento (almoço/jantar).
+**Condições:** ausência de proteção contra grandes volumes de requisições (ex: mitigação de DDoS, limitação de taxa).
+**Fluxo de abuso:**
+1. O atacante identifica o horário de maior uso da plataforma.
+2. O atacante envia um grande volume de requisições simultâneas ao sistema.
+3. Os servidores ficam sobrecarregados e deixam de responder adequadamente.
+4. Clientes e estabelecimentos ficam impossibilitados de utilizar o sistema.
+
+**Impacto:** perda de vendas, indisponibilidade do serviço e insatisfação de clientes e estabelecimentos.
+
+**Categorias STRIDE relacionadas:** Denial of Service.
+ 
+---
+ 
+### CA12 — Elevação de privilégio via manipulação de token
+**Ator:** cliente comum mal-intencionado.
+**Objetivo:** obter acesso a funcionalidades restritas a administradores.
+**Condições:** o backend não valida corretamente a assinatura do token de autenticação (JWT), permitindo alteração de seus campos.
+**Fluxo de abuso:**
+1. O atacante autentica-se normalmente como cliente.
+2. O atacante analisa a estrutura do token de autenticação recebido.
+3. O atacante altera o campo referente ao perfil de acesso (de "cliente" para "administrador").
+4. O sistema aceita o token alterado por falha na validação da assinatura.
+
+**Impacto:** acesso não autorizado a funções administrativas, comprometimento da segurança do sistema.
+
+**Categorias STRIDE relacionadas:** Elevation of Privilege, Tampering.
+ 
+---
+ 
+### CA13 — Fraude interna por atendente de suporte
+**Ator:** atendente de suporte (usuário legítimo, ameaça interna).
+**Objetivo:** obter vantagem financeira indevida em conluio com terceiros.
+**Condições:** o processo de reembolso não exige segunda aprovação nem gera trilha de auditoria detalhada vinculando a ação ao responsável.
+**Fluxo de abuso:**
+1. O atendente identifica pedidos já entregues normalmente.
+2. O atendente, em conluio com um cliente ou conta falsa, processa reembolso para esses pedidos sem motivo legítimo.
+3. O sistema aprova o reembolso, pois o atendente possui essa permissão dentro de suas atribuições.
+4. O valor reembolsado é dividido entre o atendente e o cúmplice.
+
+**Impacto:** fraude interna recorrente, prejuízo financeiro direto e de difícil detecção, já que a ação é tecnicamente autorizada.
+
+**Categorias STRIDE relacionadas:** Repudiation, Elevation of Privilege.
+ 
+---
