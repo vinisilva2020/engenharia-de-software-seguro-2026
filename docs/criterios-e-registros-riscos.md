@@ -75,4 +75,3 @@ A pontuação é utilizada como apoio para comparação e priorização dos risc
 | **R18** | T18 – Elevation of Privilege | Um funcionário comum obtém permissões administrativas da empresa.                                 | Configuração incorreta de papéis ou falhas na verificação de privilégios.                      | 2         | 3           | **6**         | Médio     |
 | **R19** | T19 – Elevation of Privilege | Um usuário comum consegue acessar funcionalidades reservadas aos administradores.                 | Ausência ou falha de validação de autorização no servidor.                                     | 2         | 4           | **8**         | Alto      |
 
----
