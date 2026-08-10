@@ -1,87 +1,99 @@
-# 2. Usuários, ativos e pontos de interação
+# 3. Usuários, ativos e pontos de interação
 
-O sistema que o grupo escolheu é uma plataforma de delivery de alimentos. Ele conecta clientes, estabelecimentos e entregadores, permitindo consultar cardápios, realizar pedidos, efetuar pagamentos, acompanhar entregas e avaliar os serviços prestados.
+Esta seção apresenta os usuários que interagem com o sistema de delivery, suas principais responsabilidades e permissões, os ativos que precisam ser protegidos, os serviços externos utilizados e os pontos de interação que podem representar superfícies de ataque.
 
-# 2.1 Usuários e perfis de acesso
+O sistema deve aplicar os princípios do menor privilégio e da necessidade de acesso, garantindo que cada usuário possa acessar somente as informações e funcionalidades necessárias para exercer suas responsabilidades. As permissões também devem ser verificadas no servidor, independentemente das restrições apresentadas pelas interfaces dos aplicativos e painéis web.
 
-Cada perfil possui permissões específicas e deve acessar somente as informações necessárias para realizar suas atividades.
+## 3.1 Usuários e perfis de acesso
 
-| Perfil   |                Descrição |                       Principais    permissões                                                                                               |
-| -------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Cliente              | Pessoa que utiliza o aplicativo para realizar pedidos   | Criar conta, consultar cardápios, fazer pedidos, pagar, acompanhar entregas, cancelar pedidos e realizar avaliações |
-| Estabelecimento      | Restaurante ou loja responsável por preparar os pedidos | Cadastrar produtos, alterar preços, aceitar pedidos, atualizar o andamento da preparação e solicitar cancelamento   |
-| Entregador           | Pessoa responsável por retirar e entregar os pedidos    | Aceitar entregas, consultar rotas e endereços e atualizar a situação da entrega                                     |
-| Atendente de suporte | Pessoa responsável por auxiliar os usuários             | Consultar pedidos, responder mensagens, registrar reclamações, processar reembolsos e solucionar problemas          |
-| Administrador        | Responsável pelo gerenciamento da plataforma            | Gerenciar usuários, estabelecimentos, entregadores, pedidos, avaliações e configurações do sistema                  |
+O sistema possui diferentes perfis de usuário, com responsabilidades, permissões e restrições específicas.
 
-Cada perfil tem acesso limitado somente às informações necessárias para desempenhar suas funções. 
+| Perfil                               | Responsabilidades e permissões                                                                                                                                                                                           | Restrições de acesso                                                                                                                                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Cliente**                          | Criar e gerenciar sua conta; consultar estabelecimentos e cardápios; realizar pedidos; efetuar pagamentos; acompanhar entregas; solicitar cancelamentos; avaliar pedidos e entrar em contato com o suporte.              | Pode acessar e alterar somente seus próprios dados, endereços, pedidos, avaliações e formas de pagamento tokenizadas.                                                                              |
+| **Responsável pelo estabelecimento** | Gerenciar os dados do estabelecimento; cadastrar funcionários; administrar cardápios, preços, promoções e disponibilidade; acompanhar pedidos; consultar relatórios; analisar cancelamentos e solicitações de reembolso. | Pode acessar somente informações, funcionários, pedidos e relatórios relacionados ao próprio estabelecimento. Não pode acessar dados de outros estabelecimentos.                                   |
+| **Funcionário do estabelecimento**   | Visualizar pedidos recebidos; aceitar ou rejeitar pedidos; atualizar o status de preparação e informar quando o pedido estiver pronto para entrega.                                                                      | Não pode cadastrar outros usuários, alterar dados financeiros, modificar permissões nem acessar relatórios administrativos sem autorização.                                                        |
+| **Entregador**                       | Cadastrar dados e documentos; visualizar entregas disponíveis; aceitar entregas; consultar o endereço necessário; compartilhar sua localização durante a entrega e atualizar o status do pedido.                         | Pode visualizar apenas os dados indispensáveis às entregas sob sua responsabilidade. O acesso ao endereço e aos dados do cliente deve ser encerrado após a conclusão da entrega.                   |
+| **Atendente de suporte**             | Consultar chamados; auxiliar clientes, estabelecimentos e entregadores; analisar pedidos; registrar ocorrências; realizar cancelamentos ou reembolsos dentro dos limites estabelecidos.                                  | Não pode visualizar senhas, dados completos de cartões, tokens de autenticação ou informações não relacionadas ao atendimento. As operações sensíveis devem ser registradas nos logs de auditoria. |
+| **Administrador da plataforma**      | Gerenciar usuários, configurações, permissões, integrações, bloqueios, políticas de segurança e logs de auditoria; acompanhar o funcionamento geral da plataforma.                                                       | Mesmo sendo um perfil privilegiado, não deve possuir acesso direto a senhas, dados completos de cartões ou outras informações desnecessárias para a administração do sistema.                      |
 
-# 2.2 Ativos importantes
+Nos diagramas, o ator denominado **Estabelecimento** pode representar o responsável e os funcionários autorizados. Entretanto, no controle de acesso do sistema, esses usuários devem possuir contas individuais e permissões diferentes.
 
-Os ativos são dados, recursos e componentes que precisam ser protegidos. O acesso, a alteração, a destruição ou a indisponibilidade desses elementos pode causar prejuízos aos usuários, aos estabelecimentos, aos entregadores e à própria plataforma.
+O **administrador da plataforma** não deve ser confundido com o **responsável pelo estabelecimento**. O primeiro administra o sistema como um todo, enquanto o segundo administra somente o estabelecimento ao qual está vinculado.
 
-| Ativo                         | Descrição                                                                     | Importância | Possível prejuízo                                                  |
-| ----------------------------- | ----------------------------------------------------------------------------- | :---------: | ------------------------------------------------------------------ |
-| Dados pessoais                | Nome, CPF, telefone e e-mail dos usuários                                     |     Alta    | Violação de privacidade e utilização indevida dos dados            |
-| Credenciais                   | E-mail, senha e códigos de acesso                                             |     Alta    | Invasão e roubo de contas                                          |
-| Tokens de autenticação        | Tokens gerados após o login para manter a sessão ativa                        |     Alta    | Sequestro de sessão e acesso não autorizado                        |
-| Dados de pagamento            | Tokens de pagamento, identificação da transação, valor e situação da cobrança |     Alta    | Fraudes e prejuízos financeiros                                    |
-| Endereço do cliente           | Local informado para a entrega do pedido                                      |     Alta    | Exposição da residência e risco à segurança                        |
-| Localização do entregador     | Posição obtida por GPS durante a entrega                                      |     Alta    | Rastreamento indevido e violação de privacidade                    |
-| Pedidos                       | Produtos, quantidades, valores, endereço e situação do pedido                 |     Alta    | Alteração indevida, cobrança incorreta ou entrega errada           |
-| Cancelamentos e reembolsos    | Solicitações e registros de cancelamentos ou estornos                         |     Alta    | Cancelamentos indevidos, fraudes e prejuízos financeiros           |
-| Cardápios e preços            | Produtos e valores cadastrados pelos estabelecimentos                         |     Alta    | Cobranças incorretas e prejuízos ao estabelecimento                |
-| Mensagens                     | Comunicação entre cliente, entregador, estabelecimento e suporte              |    Média    | Exposição de informações e aplicação de golpes                     |
-| Avaliações                    | Notas e comentários publicados pelos clientes                                 |    Média    | Manipulação de avaliações e danos à reputação                      |
-| Documentos                    | Documentos de identificação de entregadores e estabelecimentos                |     Alta    | Fraude de identidade e criação de cadastros falsos                 |
-| Configurações do sistema      | Taxas, regras, validações e permissões da plataforma                          |     Alta    | Comprometimento da segurança ou do funcionamento do sistema        |
-| Banco de dados                | Armazena usuários, pedidos, pagamentos e avaliações                           |     Alta    | Vazamento, alteração ou perda de informações                       |
-| Histórico de operações        | Registra pedidos, pagamentos, cancelamentos e alterações                      |     Alta    | Dificuldade para identificar fraudes e responsabilizar usuários    |
-| Logs de auditoria e segurança | Registram acessos, tentativas de login e eventos de segurança                 |     Alta    | Dificuldade para detectar e investigar incidentes                  |
-| Servidores                    | Mantêm o sistema disponível e processam suas operações                        |     Alta    | Interrupção ou indisponibilidade do serviço                        |
-| APIs                          | Permitem a comunicação entre aplicativos, servidores e serviços externos      |     Alta    | Vazamento, interceptação ou alteração de dados                     |
-| Aplicativo móvel              | Interface utilizada pelos clientes e entregadores                             |     Alta    | Acesso indevido às funcionalidades ou indisponibilidade do serviço |
+Contas administrativas ou privilegiadas devem utilizar mecanismos adicionais de proteção, como autenticação multifator, limitação de tentativas de acesso, encerramento de sessões inativas e registro das operações realizadas.
 
-Os ativos considerados mais críticos são os dados pessoais, as credenciais, os tokens de autenticação, os dados de pagamento, os endereços, a localização, os pedidos, os cancelamentos e reembolsos, as configurações do sistema, os logs de auditoria e o banco de dados.
+## 3.2 Ativos importantes
 
+Os ativos são informações, componentes e recursos que possuem valor para o sistema e que precisam ser protegidos contra acesso não autorizado, adulteração, divulgação, destruição ou indisponibilidade.
 
-# 2.3 Serviços externos
+| Categoria                      | Ativos                                                                                                                            | Requisitos de segurança                           |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| **Dados pessoais**             | Nome, CPF, e-mail, telefone, endereço, localização e demais informações cadastrais.                                               | Confidencialidade e integridade.                  |
+| **Dados de autenticação**      | Senhas protegidas por hash, tokens de sessão, códigos de recuperação, chaves de API e credenciais de integração.                  | Confidencialidade, integridade e autenticidade.   |
+| **Dados de pagamento**         | Tokens de pagamento, identificadores de transação, valores, status do pagamento e informações de reembolso.                       | Confidencialidade, integridade e rastreabilidade. |
+| **Dados dos pedidos**          | Produtos, quantidades, valores, endereço de entrega, estabelecimento, cliente, entregador e histórico de status.                  | Confidencialidade, integridade e disponibilidade. |
+| **Dados dos estabelecimentos** | Informações cadastrais, cardápios, preços, promoções, disponibilidade de produtos e dados financeiros.                            | Integridade, confidencialidade e disponibilidade. |
+| **Dados de entrega**           | Localização do entregador, rotas, endereço do cliente, horário e comprovação da entrega.                                          | Confidencialidade, integridade e disponibilidade. |
+| **Cancelamentos e reembolsos** | Motivos, valores, autorizações, responsáveis e histórico das operações.                                                           | Integridade, autenticidade e rastreabilidade.     |
+| **Comunicações**               | Mensagens entre usuários, notificações, chamados de suporte e registros de atendimento.                                           | Confidencialidade, integridade e disponibilidade. |
+| **Avaliações**                 | Notas, comentários e respostas relacionadas aos pedidos, estabelecimentos e entregadores.                                         | Integridade e autenticidade.                      |
+| **Documentos enviados**        | Documentos cadastrais de estabelecimentos e entregadores e comprovantes utilizados na validação das contas.                       | Confidencialidade e integridade.                  |
+| **Logs de auditoria**          | Registros de login, alterações cadastrais, acessos administrativos, pagamentos, cancelamentos, reembolsos e eventos de segurança. | Integridade, disponibilidade e rastreabilidade.   |
+| **Infraestrutura**             | Aplicativos, painéis web, APIs, banco de dados, servidores, serviços internos e armazenamento em nuvem.                           | Confidencialidade, integridade e disponibilidade. |
+| **Configurações do sistema**   | Regras de acesso, limites de reembolso, parâmetros de segurança, permissões e configurações das integrações.                      | Integridade e disponibilidade.                    |
 
-O sistema de delivery depende de serviços fornecidos por empresas externas para realizar determinadas operações. Embora esses serviços não sejam controlados diretamente pela plataforma, falhas, ataques ou indisponibilidades podem comprometer o funcionamento e a segurança do sistema.
+CPF, e-mail, telefone, endereço e localização são dados pessoais e devem ser protegidos contra acesso e divulgação indevidos. Entretanto, não devem ser automaticamente classificados como dados pessoais sensíveis. Essa classificação deve respeitar a natureza e o contexto de cada informação tratada.
 
-| Serviço externo                   | Finalidade                                                                             | Risco relacionado                                                                   |
-| --------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Gateway de pagamento              | Processar pagamentos, confirmar transações e realizar estornos                         | Fraudes, vazamento de informações, transações incorretas ou indisponibilidade       |
-| Serviço de mapas e GPS            | Calcular rotas, localizar endereços e acompanhar entregas                              | Exposição da localização, rastreamento indevido ou fornecimento de rotas incorretas |
-| Serviço de notificações           | Enviar atualizações sobre pedidos por notificação, SMS ou e-mail                       | Mensagens falsas, atrasadas, interceptadas ou não entregues                         |
-| Provedor de autenticação          | Permitir o acesso por contas externas, como Google ou Apple                            | Acesso indevido caso a conta externa ou o provedor seja comprometido                |
-| Serviço de armazenamento em nuvem | Armazenar documentos, imagens, registros e outros arquivos do sistema                  | Vazamento, alteração, perda de dados ou indisponibilidade                           |
-| Serviço de comunicação            | Permitir a troca de mensagens entre clientes, estabelecimentos, entregadores e suporte | Interceptação de mensagens, exposição de informações ou aplicação de golpes         |
+Os dados completos dos cartões não devem ser armazenados diretamente pelo sistema de delivery. O processamento deve ser realizado por um gateway de pagamento, e a aplicação deve manter apenas tokens e identificadores necessários para acompanhar as transações.
 
-A integração com esses serviços deve ocorrer por meio de conexões seguras e APIs autenticadas. A plataforma também deve limitar as informações compartilhadas, proteger as chaves de acesso e registrar as operações realizadas. Além disso, deve prever medidas alternativas para reduzir os impactos causados pela falha ou indisponibilidade de um serviço externo.
+Os dados pessoais, documentos, logs e cópias de segurança também devem possuir prazos de retenção definidos. Após o término da finalidade ou do prazo aplicável, as informações devem ser descartadas de maneira segura.
 
+## 3.3 Serviços externos
 
-# 2.4 Pontos de interação
+O sistema pode utilizar serviços externos para executar funcionalidades específicas. Essas integrações aumentam a superfície de ataque e devem utilizar conexões seguras, autenticação, validação das respostas e compartilhamento mínimo de informações.
 
-Os pontos de interação representam as funcionalidades pelas quais usuários, componentes internos e serviços externos trocam informações. Esses pontos precisam ser protegidos, pois podem ser utilizados como portas de entrada para ataques, fraudes e acessos não autorizados.
+| Serviço externo                      | Finalidade                                                                       | Informações compartilhadas                                                       | Cuidados de segurança                                                                                                      |
+| ------------------------------------ | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Gateway de pagamento**             | Processar pagamentos, estornos e reembolsos.                                     | Identificador do pedido, valor, token de pagamento e status da transação.        | Utilizar HTTPS, proteger as chaves de API, validar os valores recebidos e verificar a assinatura dos webhooks.             |
+| **Serviço de mapas e GPS**           | Calcular rotas, localizar endereços e acompanhar entregas.                       | Endereços, coordenadas e informações de rota.                                    | Limitar a coleta de localização e impedir o acesso após a conclusão da entrega.                                            |
+| **Serviço de notificações**          | Enviar notificações pelo aplicativo, SMS ou e-mail.                              | Identificador do usuário, dispositivo, contato e conteúdo mínimo da notificação. | Evitar a inclusão de dados pessoais desnecessários nas mensagens e proteger as credenciais da integração.                  |
+| **Provedor de autenticação externa** | Permitir o login por serviços de terceiros.                                      | Identificador, nome, e-mail e tokens de autenticação.                            | Validar assinatura, validade, emissor e destinatário dos tokens recebidos.                                                 |
+| **Armazenamento em nuvem**           | Armazenar documentos, imagens, comprovantes e cópias de segurança.               | Arquivos enviados e metadados relacionados.                                      | Utilizar criptografia, controle de acesso, prazo de retenção, links temporários e configurações privadas de armazenamento. |
+| **Serviço de comunicação**           | Possibilitar mensagens entre clientes, estabelecimentos, entregadores e suporte. | Mensagens e identificadores dos participantes.                                   | Restringir o acesso aos participantes, validar o conteúdo enviado e registrar eventos relevantes para auditoria.           |
 
-| Ponto de interação        | Envolvidos                                               | Informações utilizadas                                                       |
-| ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Cadastro de usuário       | Usuário, aplicativo e servidor                           | Dados pessoais, credenciais e, quando aplicável, documentos de identificação |
-| Login                     | Usuário, aplicativo e servidor                           | E-mail, telefone, senha e dados da sessão                                    |
-| Recuperação de senha      | Usuário, servidor e serviço de notificação               | E-mail, telefone e código de recuperação                                     |
-| Consulta ao cardápio      | Cliente, aplicativo e estabelecimento                    | Produtos, preços e disponibilidade                                           |
-| Gerenciamento do cardápio | Estabelecimento, aplicativo e servidor                   | Produtos, descrições, preços e disponibilidade                               |
-| Realização do pedido      | Cliente, estabelecimento e servidor                      | Produtos, quantidades, valores e endereço de entrega                         |
-| Pagamento                 | Cliente, sistema e gateway de pagamento                  | Valor, forma de pagamento, token da transação e identificação do pedido      |
-| Aceitação do pedido       | Estabelecimento e sistema                                | Informações do pedido e tempo estimado de preparo                            |
-| Cancelamento e reembolso  | Cliente, estabelecimento, suporte e gateway de pagamento | Motivo do cancelamento, situação do pedido e valor do reembolso              |
-| Solicitação de entrega    | Sistema e entregador                                     | Informações do pedido, endereços e localização                               |
-| Atualização da entrega    | Entregador, aplicativo e servidor                        | Situação do pedido e confirmação da entrega                                  |
-| Acompanhamento da entrega | Cliente, entregador, aplicativo e serviço de GPS         | Localização e andamento da entrega                                           |
-| Troca de mensagens        | Cliente, entregador, estabelecimento e suporte           | Mensagens e informações relacionadas ao pedido                               |
-| Avaliação do serviço      | Cliente, estabelecimento, entregador e sistema           | Nota e comentário                                                            |
-| Atendimento de suporte    | Usuário, atendente e sistema                             | Dados do pedido, reclamações, mensagens e solicitações                       |
-| Painel administrativo     | Administrador, servidor e banco de dados                 | Dados de usuários, pedidos, configurações e registros de operações           |
+As credenciais utilizadas nas integrações não devem ser armazenadas diretamente no código-fonte ou em repositórios públicos. Elas devem ser mantidas em variáveis de ambiente ou em mecanismos seguros de gerenciamento de segredos.
 
-Esses pontos de interação devem utilizar mecanismos adequados de autenticação, autorização, criptografia e validação das informações. Também é necessário registrar as operações importantes para permitir a identificação e a investigação de possíveis fraudes ou incidentes de segurança.
+Uma falha ou indisponibilidade em um serviço externo não deve comprometer completamente a aplicação. O sistema deve tratar respostas inválidas, erros de conexão, mensagens duplicadas, atrasos, indisponibilidades e tentativas de falsificação das integrações.
+
+## 3.4 Pontos de interação
+
+Os pontos de interação são funcionalidades e interfaces pelas quais usuários, componentes internos ou serviços externos enviam e recebem informações. Esses pontos precisam ser protegidos porque podem ser utilizados para ataques, fraudes ou acessos não autorizados.
+
+| ID       | Ponto de interação                    | Participantes                                                                          | Informações envolvidas                                        | Principais riscos                                                                                |
+| -------- | ------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **PI01** | Cadastro de usuários                  | Cliente, responsável pelo estabelecimento, entregador e API                            | Dados cadastrais, documentos e credenciais                    | Cadastro falso, falsificação de identidade e envio de arquivos maliciosos.                       |
+| **PI02** | Login e autenticação                  | Todos os perfis e provedor de autenticação externa                                     | E-mail, senha, tokens e códigos de recuperação                | Roubo de conta, preenchimento automatizado de credenciais, força bruta e reutilização de tokens. |
+| **PI03** | Recuperação de acesso                 | Todos os perfis                                                                        | E-mail, telefone, códigos e tokens de recuperação             | Sequestro de conta, interceptação de códigos e reutilização de tokens.                           |
+| **PI04** | Alteração cadastral                   | Todos os perfis autorizados                                                            | Dados pessoais, endereço, telefone e dados do estabelecimento | Alteração não autorizada, falsificação de dados e exposição de informações.                      |
+| **PI05** | Consulta e gerenciamento de cardápios | Cliente, responsável pelo estabelecimento, funcionário e API                           | Produtos, preços, promoções e disponibilidade                 | Manipulação de preços, alteração indevida e apresentação de informações incorretas.              |
+| **PI06** | Criação e atualização de pedidos      | Cliente, estabelecimento, entregador e API                                             | Produtos, quantidades, valores, endereço e status             | Alteração do pedido, acesso indevido, fraude e atualização não autorizada de status.             |
+| **PI07** | Processamento de pagamento            | Cliente, API e gateway de pagamento                                                    | Token, valor, identificador e status da transação             | Falsificação de pagamento, adulteração do valor, repetição da transação e webhook fraudulento.   |
+| **PI08** | Cancelamento e reembolso              | Cliente, responsável pelo estabelecimento, atendente de suporte e gateway de pagamento | Pedido, motivo, valor e autorização                           | Reembolso indevido, fraude, abuso de privilégio e repúdio da operação.                           |
+| **PI09** | Aceitação e gestão de entregas        | Estabelecimento, entregador e API                                                      | Pedido, endereço, horário e status                            | Apropriação indevida da entrega, acesso a dados de outra entrega e alteração do status.          |
+| **PI10** | Rastreamento da entrega               | Cliente, entregador, API e serviço de mapas e GPS                                      | Localização, rota e previsão de chegada                       | Exposição, manipulação ou falsificação da localização.                                           |
+| **PI11** | Mensagens e notificações              | Usuários, API e serviços externos                                                      | Mensagens, identificadores e dados mínimos do pedido          | Phishing, spam, exposição de dados, falsificação de remetente e conteúdo malicioso.              |
+| **PI12** | Avaliações                            | Cliente, estabelecimento e entregador                                                  | Nota, comentário e pedido relacionado                         | Avaliações falsas, manipulação de notas, conteúdo ofensivo e negação de autoria.                 |
+| **PI13** | Atendimento de suporte                | Usuários e atendente de suporte                                                        | Chamados, dados do pedido e registros de atendimento          | Engenharia social, acesso excessivo, alteração indevida e divulgação de informações.             |
+| **PI14** | Envio de documentos e arquivos        | Entregador, responsável pelo estabelecimento, suporte e armazenamento em nuvem         | Documentos, imagens e comprovantes                            | Malware, arquivos adulterados, formatos não permitidos e acesso não autorizado.                  |
+| **PI15** | Painéis administrativos               | Responsável pelo estabelecimento, atendente de suporte e administrador da plataforma   | Usuários, permissões, pedidos, configurações e relatórios     | Elevação de privilégio, alteração não autorizada, abuso de acesso e exposição de dados.          |
+| **PI16** | APIs e webhooks                       | Aplicativos, painéis, componentes internos e serviços externos                         | Requisições, tokens, eventos e respostas                      | Injeção, falsificação, repetição de mensagens, acesso não autorizado e indisponibilidade.        |
+| **PI17** | Banco de dados e logs                 | API, componentes internos e administradores autorizados                                | Dados persistentes e registros de auditoria                   | Vazamento, adulteração, exclusão, indisponibilidade e negação das ações realizadas.              |
+
+Todos os pontos de interação devem possuir mecanismos adequados de autenticação e autorização, validação das entradas, comunicação criptografada, limitação de requisições e registro das operações relevantes.
+
+Os controles de acesso devem ser verificados no servidor, sem confiar somente nas restrições apresentadas pelas interfaces dos aplicativos ou painéis web. O sistema também deve impedir que a alteração de identificadores em requisições permita o acesso aos dados de outros usuários, pedidos, entregas ou estabelecimentos.
+
+Operações sensíveis, como alterações de permissões, reembolsos, bloqueios, mudanças cadastrais e acessos administrativos, devem exigir autorização específica e gerar registros de auditoria contendo, no mínimo, usuário responsável, data, horário, operação realizada e resultado obtido.
+
+A identificação dos usuários, ativos, serviços externos e pontos de interação fornece a base necessária para a modelagem de ameaças com STRIDE, permitindo relacionar cada ameaça aos componentes, informações e funcionalidades que podem ser afetados.
