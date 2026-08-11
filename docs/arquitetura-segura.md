@@ -23,3 +23,7 @@ Para cada requisito de segurança foi pesquisada uma vulnerabilidade ou categori
 | **R04 – Comprometimento de conta administrativa** | Autenticação inadequada           | **CWE-287 – Improper Authentication / OWASP A07:2025 – Authentication Failures** | Uma falha na autenticação pode permitir que um atacante seja reconhecido como um administrador legítimo e obtenha acesso ao painel e às operações privilegiadas do sistema.                                 |
 | **R11 – Exposição de dados dos clientes**         | Autorização incorreta             | **CWE-863 – Incorrect Authorization / OWASP A01:2025 – Broken Access Control**   | Uma falha na verificação das permissões pode permitir que um usuário acesse dados pessoais que não deveriam estar disponíveis para o seu perfil.                                                            |
 | **R16 – Indisponibilidade da API de pagamentos**  | Consumo inseguro de APIs externas | **OWASP API Security Top 10:2023 – API10: Unsafe Consumption of APIs**           | A ausência de tratamento adequado para lentidão, erros ou indisponibilidade do serviço externo pode fazer com que requisições permaneçam aguardando respostas e comprometam o processamento dos pagamentos. |
+---
+## 11.2 Diagrama da arquitetura segura
+
+O diagrama apresenta a organização proposta para o sistema de delivery e a posição dos principais controles relacionados aos riscos selecionados.
