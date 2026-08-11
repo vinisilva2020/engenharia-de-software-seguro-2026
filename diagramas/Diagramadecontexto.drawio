@@ -1,0 +1,123 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="mzSLZOaiW6W80d_sfZGu">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4YWBONx0QLJkFAQ43ket-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="cliente" vertex="1">
+          <mxGeometry height="60" width="120" x="500" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="entregador" vertex="1">
+          <mxGeometry height="60" width="120" x="840" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Sistema de Pagamento" vertex="1">
+          <mxGeometry height="60" width="120" x="740" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Administrador" vertex="1">
+          <mxGeometry height="60" width="120" x="200" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Estabelecimento" vertex="1">
+          <mxGeometry height="60" width="120" x="90" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-8" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;" value="Sistema Delivery" vertex="1">
+          <mxGeometry height="120" width="120" x="500" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-9" edge="1" parent="1" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="4YWBONx0QLJkFAQ43ket-5" value="j">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="400" />
+            </Array>
+            <mxPoint x="500" y="400" as="sourcePoint" />
+            <mxPoint x="660" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-14" connectable="0" parent="4YWBONx0QLJkFAQ43ket-9" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Relatórios globais, logs&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.0343" y="3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-10" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-8" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="4YWBONx0QLJkFAQ43ket-6" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Novo pedido, status pedido&lt;/font&gt;">
+          <mxGeometry relative="1" width="160" x="0.4894" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="150" y="380" />
+            </Array>
+            <mxPoint x="500" y="400" as="sourcePoint" />
+            <mxPoint x="660" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-11" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-8" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;entryX=0.158;entryY=0.983;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0;exitY=0;exitDx=0;exitDy=0;" target="4YWBONx0QLJkFAQ43ket-2" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Confirmação,&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;status pedido&lt;/font&gt;&lt;/div&gt;">
+          <mxGeometry relative="1" width="160" x="0.3855" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="500" y="400" as="sourcePoint" />
+            <mxPoint x="660" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-12" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-8" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;entryX=0.608;entryY=-0.017;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.967;exitY=0.717;exitDx=0;exitDy=0;exitPerimeter=0;" target="4YWBONx0QLJkFAQ43ket-4" value="">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="406.04" />
+            </Array>
+            <mxPoint x="500" y="400" as="sourcePoint" />
+            <mxPoint x="660" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-15" connectable="0" parent="4YWBONx0QLJkFAQ43ket-12" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Valor, token pagamento&lt;/font&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1786" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-13" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-8" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;entryX=0.65;entryY=1.05;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="4YWBONx0QLJkFAQ43ket-3" value="">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <Array as="points">
+              <mxPoint x="918" y="380" />
+            </Array>
+            <mxPoint x="500" y="400" as="sourcePoint" />
+            <mxPoint x="660" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-16" connectable="0" parent="4YWBONx0QLJkFAQ43ket-13" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Solicitação entrega,&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;endereço, dados pedido&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2291" as="geometry">
+            <mxPoint x="120" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-17" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-6" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="4YWBONx0QLJkFAQ43ket-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Cardápio, valores,&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;atualização pedido&lt;/font&gt;&lt;/div&gt;">
+          <mxGeometry relative="1" width="160" x="-0.2464" y="-5" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="310" y="270" />
+            </Array>
+            <mxPoint x="500" y="390" as="sourcePoint" />
+            <mxPoint x="660" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-19" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-8" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;entryX=0.842;entryY=1.067;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0;exitDx=0;exitDy=0;" target="4YWBONx0QLJkFAQ43ket-2" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Login, pedido,&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp;pagamento,avaliação&lt;/font&gt;&lt;/div&gt;">
+          <mxGeometry relative="1" width="160" x="-0.095" y="1" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="500" y="390" as="sourcePoint" />
+            <mxPoint x="660" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-20" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-3" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0;exitY=0.633;exitDx=0;exitDy=0;exitPerimeter=0;" target="4YWBONx0QLJkFAQ43ket-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Confirmação entrega,&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp;localização&lt;/font&gt;&lt;/div&gt;">
+          <mxGeometry relative="1" width="160" x="0.0994" y="10" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="500" y="380" as="sourcePoint" />
+            <mxPoint x="660" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-21" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-5" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" target="4YWBONx0QLJkFAQ43ket-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Configurações,&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;login usuário&lt;/font&gt;&lt;/div&gt;">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="500" y="370" as="sourcePoint" />
+            <mxPoint x="660" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4YWBONx0QLJkFAQ43ket-22" edge="1" parent="1" source="4YWBONx0QLJkFAQ43ket-4" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;" target="4YWBONx0QLJkFAQ43ket-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Toke pagamento,&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;status transferencia&lt;/font&gt;&lt;/div&gt;">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="500" y="360" as="sourcePoint" />
+            <mxPoint x="660" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
