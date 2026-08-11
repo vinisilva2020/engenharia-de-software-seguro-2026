@@ -1,0 +1,605 @@
+/* ------------------------------------------------------------------
+   Delivery Seguro — folha de estilos
+   Direção editorial de "impresso": papel, tinta, quadrados e réguas.
+   ------------------------------------------------------------------ */
+
+:root {
+  --creme: #f6f3eb;
+  --superficie: #fcfaf2;
+  --verde: #56604a;
+  --verde-forte: #4a5440;
+  --tinta: #363b30;
+  --tinta-suave: #6a6c60;
+  --traco: #d8d2c3;
+  --traco-forte: #b6ad97;
+  --acento: #ad5b31;
+  --ok: #4f7152;
+
+  --fonte-titulo: "Space Grotesk", "Trebuchet MS", system-ui, sans-serif;
+  --fonte-corpo: "Archivo", "Segoe UI", system-ui, sans-serif;
+
+  --largura-conteudo: 1060px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0 auto;
+  max-width: var(--largura-conteudo);
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 clamp(1.1rem, 5vw, 2.5rem) clamp(3rem, 8vw, 6rem);
+  background:
+    radial-gradient(1200px 520px at 12% -8%, rgba(86, 96, 74, 0.07), transparent 60%),
+    radial-gradient(900px 460px at 95% 110%, rgba(173, 91, 49, 0.05), transparent 55%),
+    var(--creme);
+  color: var(--tinta);
+  font-family: var(--fonte-corpo);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+/* Régua fixa no topo da janela. */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--verde);
+  z-index: 1;
+}
+
+/* Empurra o rodapé para o fim da janela quando o conteúdo é curto. */
+.conteudo {
+  flex: 1 0 auto;
+  margin-bottom: clamp(3.5rem, 8vw, 5.5rem);
+}
+
+::selection {
+  background: var(--verde);
+  color: var(--creme);
+}
+
+:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------- masthead */
+
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.1rem 0 1.2rem;
+  border-bottom: 1px solid var(--traco);
+  margin-bottom: clamp(2.25rem, 5vw, 3.5rem);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  color: var(--tinta);
+  text-decoration: none;
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.marca-selo {
+  width: 15px;
+  height: 15px;
+  background: var(--verde);
+  position: relative;
+  flex: none;
+}
+
+.marca-selo::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid var(--creme);
+}
+
+.masthead-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.link-nav {
+  color: var(--tinta-suave);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.15s ease;
+}
+
+.link-nav:hover {
+  color: var(--tinta);
+}
+
+.usuario-nav {
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+  border: 1px solid var(--traco);
+  padding: 0.4rem 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+/* -------------------------------------------------- tipografia */
+
+h1,
+h2 {
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(1.9rem, 1.6vw + 1.2rem, 2.6rem);
+  margin: 0 0 1.5rem;
+}
+
+h2 {
+  font-size: clamp(1.25rem, 1vw + 0.9rem, 1.5rem);
+  margin: 0 0 1rem;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  margin: 0 0 0.9rem;
+  font-family: var(--fonte-titulo);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.kicker::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  background: var(--acento);
+  flex: none;
+}
+
+a {
+  color: var(--verde);
+  text-underline-offset: 0.2em;
+}
+
+/* ------------------------------------------------------ botões */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid var(--verde);
+  border-radius: 0;
+  background: var(--verde);
+  color: var(--creme);
+  font-family: var(--fonte-titulo);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.botao::before {
+  content: "";
+  width: 0.55em;
+  height: 0.55em;
+  background: var(--creme);
+  flex: none;
+}
+
+.botao:hover {
+  background: var(--verde-forte);
+}
+
+.botao:focus-visible {
+  outline-color: var(--tinta);
+}
+
+.botao--pequeno {
+  padding: 0.55rem 1.05rem;
+  font-size: 0.76rem;
+}
+
+.botao--bloco {
+  width: 100%;
+}
+
+.botao--fosco {
+  background: transparent;
+  color: var(--verde);
+  border-color: var(--traco);
+}
+
+.botao--fosco::before {
+  background: var(--verde);
+}
+
+.botao--fosco:hover {
+  border-color: var(--verde);
+  color: var(--verde-forte);
+  background: transparent;
+}
+
+.link-setinha {
+  display: inline-block;
+  color: var(--tinta);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid var(--traco);
+  padding-bottom: 0.15em;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.link-setinha:hover {
+  border-color: var(--verde);
+  color: var(--verde);
+}
+
+/* ------------------------------------------------ home: hero */
+
+.hero {
+  max-width: 700px;
+  padding: clamp(0.5rem, 2.5vw, 1.5rem) 0 1rem;
+}
+
+.hero-titulo {
+  font-size: clamp(2.1rem, 4.2vw + 0.8rem, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.2rem;
+}
+
+.hero-texto {
+  margin: 0 0 2rem;
+  max-width: 48ch;
+  font-size: 1.06rem;
+  color: var(--tinta-suave);
+}
+
+.hero-acoes {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* ----------------------------------------------- home: portais */
+
+.portais {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin: clamp(2.5rem, 6vw, 4rem) 0;
+}
+
+.portal {
+  position: relative;
+  display: grid;
+  gap: 0.45rem;
+  padding: 1.7rem 1.8rem 2.4rem;
+  background: var(--superficie);
+  border: 1px solid var(--traco);
+  border-top: 4px solid var(--verde);
+  color: var(--tinta);
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.portal:hover {
+  border-color: var(--traco-forte);
+  transform: translateY(-3px);
+  box-shadow: 5px 5px 0 rgba(54, 59, 48, 0.09);
+}
+
+.portal-numero {
+  font-family: var(--fonte-titulo);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  color: var(--tinta-suave);
+}
+
+.portal h2 {
+  margin: 0.2rem 0 0;
+  font-size: 1.55rem;
+}
+
+.portal p {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: 0.95rem;
+}
+
+.portal-seta {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.3rem;
+  font-size: 1.25rem;
+  color: var(--verde);
+}
+
+/* ------------------------------------------------ home: selos */
+
+.selos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 2.4rem;
+  padding: 2.4rem 0 0.5rem;
+  border-top: 1px solid var(--traco);
+}
+
+.selo-marca {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--verde);
+  margin-bottom: 1.1rem;
+  position: relative;
+}
+
+.selo-marca::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 12px;
+  height: 12px;
+  background: var(--creme);
+}
+
+.selo h3 {
+  margin: 0 0 0.35rem;
+  font-family: var(--fonte-titulo);
+  font-size: 1.02rem;
+}
+
+.selo p {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: 0.9rem;
+}
+
+/* ------------------------------------------- auth: cartão */
+
+.pagina-auth {
+  display: grid;
+  justify-items: center;
+}
+
+.cartao-auth {
+  width: 100%;
+  max-width: 540px;
+  padding: clamp(1.6rem, 4vw, 2.5rem);
+  background: var(--superficie);
+  border: 1px solid var(--traco);
+  border-top: 4px solid var(--verde);
+}
+
+.cartao-auth h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.7rem, 1.2vw + 1.2rem, 2.2rem);
+}
+
+.cartao-auth-descricao {
+  margin: 0 0 1.9rem;
+  color: var(--tinta-suave);
+  font-size: 0.95rem;
+}
+
+/* ---------------------------------------------- formulários */
+
+form {
+  display: grid;
+  gap: 1.35rem;
+  margin: 0;
+}
+
+.campo {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.campo > span {
+  font-family: var(--fonte-titulo);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.6rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--traco);
+  border-radius: 0;
+  background: transparent;
+  color: var(--tinta);
+  font: inherit;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-bottom: 2px solid var(--verde);
+}
+
+input::placeholder {
+  color: var(--tinta-suave);
+  opacity: 0.8;
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%2356604A' stroke-width='1.6' d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.2rem center;
+  padding-right: 1.5rem;
+}
+
+.dica {
+  color: var(--tinta-suave);
+  font-size: 0.82rem;
+}
+
+/* -------------------------------------------------- alertas */
+
+.alerta {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--traco);
+  border-left: 3px solid var(--tinta-suave);
+  background: var(--superficie);
+  color: var(--tinta);
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.alerta--sucesso {
+  border-left-color: var(--ok);
+}
+
+.alerta--erro {
+  border-left-color: var(--acento);
+}
+
+/* -------------------------------------------------- painéis */
+
+.painel-cabecalho {
+  max-width: 660px;
+  margin-bottom: 2.2rem;
+}
+
+.painel-cabecalho h1 {
+  margin: 0 0 0.7rem;
+  font-size: clamp(1.9rem, 1.6vw + 1.2rem, 2.6rem);
+}
+
+.painel-sub {
+  margin: 0;
+  color: var(--tinta-suave);
+}
+
+.painel-status {
+  padding: 1.15rem 1.35rem;
+  background: var(--superficie);
+  border: 1px solid var(--traco);
+  border-left: 4px solid var(--verde);
+  margin-bottom: 2.6rem;
+}
+
+.painel-status .kicker {
+  margin-bottom: 0.65rem;
+}
+
+.painel-status p {
+  color: var(--tinta-suave);
+}
+
+.painel-status p:last-child {
+  margin-bottom: 0;
+}
+
+.painel-status .painel-contagem {
+  margin-top: 0.65rem;
+  color: var(--tinta);
+  font-family: var(--fonte-titulo);
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+
+/* Atalhos de demonstração: comandos inertes, só para compor a tela. */
+
+.painel-acoes {
+  padding-top: 2.1rem;
+  border-top: 1px solid var(--traco);
+}
+
+.acoes-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.9rem;
+}
+
+.acoes-grade .botao {
+  width: 100%;
+}
+
+/* ---------------------------------------------------- rodapé */
+
+.rodape {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--traco);
+  color: var(--tinta-suave);
+  font-size: 0.82rem;
+}
+
+/* ------------------------------------------ acessibilidade */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none;
+  }
+
+  .portal:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .masthead {
+    justify-content: center;
+  }
+
+  .rodape {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+}

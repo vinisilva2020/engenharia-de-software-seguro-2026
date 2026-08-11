@@ -1,31 +1,113 @@
 <!doctype html>
 <html lang="pt-BR">
-  <meta charset="utf-8" />
-  <title>Cadastro</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cadastro — Delivery Seguro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
   <body>
-    <h1>Cadastro</h1>
-    <form id="f">
-      <input name="name" required placeholder="Nome" />
-      <input name="email" type="email" required placeholder="E-mail" />
-      <input name="password" type="password" minlength="12" required placeholder="Senha" />
-      <select name="role">
-        <option value="clientes">Cliente</option>
-        <option value="entregadores">Entregador</option>
-        <option value="estabelecimentos">Estabelecimento</option>
-      </select>
-      <button>Cadastrar</button>
-    </form>
-    <pre id="r"></pre>
+    <header class="masthead">
+      <a class="marca" href="/" aria-label="Delivery Seguro — início">
+        <span class="marca-selo" aria-hidden="true"></span>
+        <span>Delivery Seguro</span>
+      </a>
+      <nav class="masthead-nav" aria-label="Navegação">
+        <a class="link-nav" href="/login">Entrar</a>
+      </nav>
+    </header>
+
+    <main class="conteudo">
+      <section class="pagina-auth">
+        <div class="cartao-auth">
+          <p class="kicker">Novo por aqui</p>
+          <h1>Cadastro</h1>
+          <p class="cartao-auth-descricao">
+            Escolha o seu papel. A senha precisa ter ao menos 12 caracteres.
+          </p>
+
+          <form id="f" novalidate>
+            <label class="campo">
+              <span>Nome</span>
+              <input name="name" required placeholder="Seu nome" autocomplete="name" />
+            </label>
+            <label class="campo">
+              <span>E-mail</span>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="voce@exemplo.com"
+                autocomplete="email"
+              />
+            </label>
+            <label class="campo">
+              <span>Senha</span>
+              <input
+                name="password"
+                type="password"
+                minlength="12"
+                required
+                placeholder="Mínimo de 12 caracteres"
+                autocomplete="new-password"
+              />
+              <small class="dica"
+                >Use ao menos 12 caracteres — de preferência com letras, números
+                e símbolos.</small
+              >
+            </label>
+            <label class="campo">
+              <span>Papel</span>
+              <select name="role">
+                <option value="clientes">Cliente</option>
+                <option value="entregadores">Entregador</option>
+                <option value="estabelecimentos">Estabelecimento</option>
+              </select>
+            </label>
+            <p class="alerta" id="r" role="status" hidden></p>
+            <button class="botao botao--bloco" type="submit">Criar conta</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <span>Projeto acadêmico · Engenharia de Software Seguro</span>
+      <span id="ano"></span>
+    </footer>
+
     <script>
+      document.getElementById("ano").textContent = new Date().getFullYear();
+
+      const r = document.getElementById("r");
       f.onsubmit = async (e) => {
         e.preventDefault();
-        let d = Object.fromEntries(new FormData(f));
-        let x = await fetch('/api/v1/auth/register/' + d.role, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(d),
+        r.hidden = true;
+        const dados = Object.fromEntries(new FormData(f));
+        const x = await fetch("/api/v1/auth/register/" + dados.role, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dados),
         });
-        r.textContent = await x.text();
+        if (!x.ok) {
+          const d = await x.json();
+          r.textContent = Array.isArray(d.detail)
+            ? "Dados inválidos. Revise o formulário."
+            : d.detail || "Não foi possível criar a conta.";
+          r.className = "alerta alerta--erro";
+          r.hidden = false;
+          return;
+        }
+        r.textContent = "Conta criada. Redirecionando para o login…";
+        r.className = "alerta alerta--sucesso";
+        r.hidden = false;
+        setTimeout(() => (location.href = "/login?cadastrado=1"), 900);
       };
     </script>
   </body>

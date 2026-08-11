@@ -1,11 +1,87 @@
 <!doctype html>
 <html lang="pt-BR">
-  <meta charset="utf-8" />
-  <title>Delivery Seguro</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Delivery Seguro — entrega confiável</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
   <body>
-    <h1>Delivery Seguro</h1>
-    <a href="/cadastro">Cadastro</a>
-    <br />
-    <a href="/login">Login</a>
+    <header class="masthead">
+      <a class="marca" href="/" aria-label="Delivery Seguro — início">
+        <span class="marca-selo" aria-hidden="true"></span>
+        <span>Delivery Seguro</span>
+      </a>
+      <nav class="masthead-nav" aria-label="Navegação">
+        <a class="link-nav" href="/cadastro">Cadastro</a>
+        <a class="botao botao--pequeno" href="/login">Entrar</a>
+      </nav>
+    </header>
+
+    <main class="conteudo">
+      <section class="hero">
+        <p class="kicker">Entrega segura, do pedido à porta</p>
+        <h1 class="hero-titulo">
+          Quem entrega, confia.<br />
+          Quem recebe, também.
+        </h1>
+        <p class="hero-texto">
+          Uma plataforma de delivery em que cada papel tem o seu espaço — e
+          nenhum passo além dele. Acesse o seu portal para começar.
+        </p>
+        <div class="hero-acoes">
+          <a class="botao" href="/cadastro">Criar conta</a>
+          <a class="link-setinha" href="/login">Já tenho conta →</a>
+        </div>
+      </section>
+
+      <section class="portais" aria-label="Acesso">
+        <a class="portal" href="/cadastro">
+          <span class="portal-numero">01</span>
+          <h2>Cadastro</h2>
+          <p>Crie sua conta como cliente, entregador ou estabelecimento.</p>
+          <span class="portal-seta" aria-hidden="true">→</span>
+        </a>
+        <a class="portal" href="/login">
+          <span class="portal-numero">02</span>
+          <h2>Login</h2>
+          <p>Entre com o e-mail cadastrado e acesse o painel da sua função.</p>
+          <span class="portal-seta" aria-hidden="true">→</span>
+        </a>
+      </section>
+
+      <section class="selos" aria-label="Princípios de segurança">
+        <div class="selo">
+          <span class="selo-marca" aria-hidden="true"></span>
+          <h3>Senhas protegidas</h3>
+          <p>Derivação com salt individual — nunca texto puro.</p>
+        </div>
+        <div class="selo">
+          <span class="selo-marca" aria-hidden="true"></span>
+          <h3>Acesso por papel</h3>
+          <p>Cada função vê apenas a própria área do sistema.</p>
+        </div>
+        <div class="selo">
+          <span class="selo-marca" aria-hidden="true"></span>
+          <h3>Sessão rastreável</h3>
+          <p>Tokens opacos, revogáveis a cada saída.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <span>Projeto acadêmico · Engenharia de Software Seguro</span>
+      <span id="ano"></span>
+    </footer>
+
+    <script>
+      document.getElementById("ano").textContent = new Date().getFullYear();
+    </script>
   </body>
 </html>

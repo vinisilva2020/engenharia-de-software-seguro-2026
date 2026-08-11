@@ -1,35 +1,106 @@
 <!doctype html>
 <html lang="pt-BR">
-  <meta charset="utf-8" />
-  <title>Login</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrar — Delivery Seguro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
   <body>
-    <h1>Login</h1>
-    <form id="f">
-      <input name="email" type="email" required placeholder="E-mail" />
-      <input name="password" type="password" required placeholder="Senha" />
-      <button>Entrar</button>
-    </form>
-    <pre id="r"></pre>
+    <header class="masthead">
+      <a class="marca" href="/" aria-label="Delivery Seguro — início">
+        <span class="marca-selo" aria-hidden="true"></span>
+        <span>Delivery Seguro</span>
+      </a>
+      <nav class="masthead-nav" aria-label="Navegação">
+        <a class="link-nav" href="/cadastro">Criar conta</a>
+      </nav>
+    </header>
+
+    <main class="conteudo">
+      <section class="pagina-auth">
+        <div class="cartao-auth">
+          <p class="kicker">Acesso restrito</p>
+          <h1>Entrar</h1>
+          <p class="cartao-auth-descricao">
+            Use o e-mail e a senha cadastrados para acessar o seu painel.
+          </p>
+
+          <div id="aviso" hidden></div>
+
+          <form id="f" novalidate>
+            <label class="campo">
+              <span>E-mail</span>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="voce@exemplo.com"
+                autocomplete="email"
+              />
+            </label>
+            <label class="campo">
+              <span>Senha</span>
+              <input
+                name="password"
+                type="password"
+                required
+                placeholder="Sua senha"
+                autocomplete="current-password"
+              />
+            </label>
+            <p class="alerta" id="r" role="status" hidden></p>
+            <button class="botao botao--bloco" type="submit">Entrar</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <span>Projeto acadêmico · Engenharia de Software Seguro</span>
+      <span id="ano"></span>
+    </footer>
+
     <script>
+      document.getElementById("ano").textContent = new Date().getFullYear();
+
+      const params = new URLSearchParams(location.search);
+      if (params.get("cadastrado")) {
+        const aviso = document.getElementById("aviso");
+        aviso.hidden = false;
+        aviso.innerHTML =
+          '<p class="alerta alerta--sucesso">Conta criada. Faça login para continuar.</p>';
+      }
+
+      const r = document.getElementById("r");
       f.onsubmit = async (e) => {
         e.preventDefault();
-        r.textContent = 'Autenticando...';
-        let x = await fetch('/api/v1/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(Object.fromEntries(new FormData(f))),
+        r.hidden = true;
+        const dados = Object.fromEntries(new FormData(f));
+        const x = await fetch("/api/v1/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dados),
         });
-        let d = await x.json();
+        const d = await x.json();
         if (!x.ok) {
-          r.textContent = d.detail || 'Falha no login';
+          r.textContent = d.detail || "Falha no login. Verifique os dados.";
+          r.className = "alerta alerta--erro";
+          r.hidden = false;
           return;
         }
-        localStorage.setItem('token', d.access_token);
-        let me = await fetch('/api/v1/me', {
-          headers: { Authorization: 'Bearer ' + d.access_token },
+        localStorage.setItem("token", d.access_token);
+        const me = await fetch("/api/v1/me", {
+          headers: { Authorization: "Bearer " + d.access_token },
         });
-        let user = await me.json();
-        location.href = '/painel/' + user.role;
+        const user = await me.json();
+        location.href = "/painel/" + user.role;
       };
     </script>
   </body>

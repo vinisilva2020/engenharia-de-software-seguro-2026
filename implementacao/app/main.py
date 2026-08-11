@@ -2,6 +2,7 @@
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.core.security import Role, User, current_user, require_roles
 from app.repositories.users import authenticate, create_user, revoke
@@ -9,6 +10,11 @@ from app.schemas import Credentials, PublicUser, Registration
 from pathlib import Path
 
 app = FastAPI(title="Delivery Seguro API", version="1.0.0")
+app.mount(
+    "/static",
+    StaticFiles(directory=str(Path(__file__).parent / "static")),
+    name="static",
+)
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
 
