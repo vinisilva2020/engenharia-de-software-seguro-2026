@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" />
+  <title>Painel do Estabelecimento</title>
+  <body>
+    <h1>Painel do Estabelecimento</h1>
+    <p id="r">Carregando...</p>
+    <button onclick="logout()">Sair</button>
+    <script>
+      async function load() {
+        let x = await fetch('/api/v1/areas/estabelecimento', {
+          headers: { Authorization: 'Bearer ' + localStorage.token },
+        });
+        let d = await x.json();
+        r.textContent = x.ok
+          ? d.message + ' — cardápio e pedidos disponíveis.'
+          : 'Acesso recusado: ' + d.detail;
+      }
+      async function logout() {
+        await fetch('/api/v1/auth/logout', {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + localStorage.token },
+        });
+        localStorage.removeItem('token');
+        location.href = '/login';
+      }
+      load();
+    </script>
+  </body>
+</html>

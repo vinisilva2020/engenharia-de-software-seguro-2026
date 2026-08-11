@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" />
+  <title>Login</title>
+  <body>
+    <h1>Login</h1>
+    <form id="f">
+      <input name="email" type="email" required placeholder="E-mail" />
+      <input name="password" type="password" required placeholder="Senha" />
+      <button>Entrar</button>
+    </form>
+    <pre id="r"></pre>
+    <script>
+      f.onsubmit = async (e) => {
+        e.preventDefault();
+        r.textContent = 'Autenticando...';
+        let x = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(f))),
+        });
+        let d = await x.json();
+        if (!x.ok) {
+          r.textContent = d.detail || 'Falha no login';
+          return;
+        }
+        localStorage.setItem('token', d.access_token);
+        let me = await fetch('/api/v1/me', {
+          headers: { Authorization: 'Bearer ' + d.access_token },
+        });
+        let user = await me.json();
+        location.href = '/painel/' + user.role;
+      };
+    </script>
+  </body>
+</html>

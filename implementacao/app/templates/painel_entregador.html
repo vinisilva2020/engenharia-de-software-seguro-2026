@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" />
+  <title>Painel do Entregador</title>
+  <body>
+    <h1>Painel do Entregador</h1>
+    <p id="r">Carregando...</p>
+    <button onclick="logout()">Sair</button>
+    <script>
+      async function load() {
+        let x = await fetch('/api/v1/areas/entregador', {
+          headers: { Authorization: 'Bearer ' + localStorage.token },
+        });
+        let d = await x.json();
+        r.textContent = x.ok
+          ? d.message + ' — entregas e rotas disponíveis.'
+          : 'Acesso recusado: ' + d.detail;
+      }
+      async function logout() {
+        await fetch('/api/v1/auth/logout', {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + localStorage.token },
+        });
+        localStorage.removeItem('token');
+        location.href = '/login';
+      }
+      load();
+    </script>
+  </body>
+</html>

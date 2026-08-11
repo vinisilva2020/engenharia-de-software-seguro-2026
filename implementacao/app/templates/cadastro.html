@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" />
+  <title>Cadastro</title>
+  <body>
+    <h1>Cadastro</h1>
+    <form id="f">
+      <input name="name" required placeholder="Nome" />
+      <input name="email" type="email" required placeholder="E-mail" />
+      <input name="password" type="password" minlength="12" required placeholder="Senha" />
+      <select name="role">
+        <option value="clientes">Cliente</option>
+        <option value="entregadores">Entregador</option>
+        <option value="estabelecimentos">Estabelecimento</option>
+      </select>
+      <button>Cadastrar</button>
+    </form>
+    <pre id="r"></pre>
+    <script>
+      f.onsubmit = async (e) => {
+        e.preventDefault();
+        let d = Object.fromEntries(new FormData(f));
+        let x = await fetch('/api/v1/auth/register/' + d.role, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(d),
+        });
+        r.textContent = await x.text();
+      };
+    </script>
+  </body>
+</html>
