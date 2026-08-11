@@ -73,3 +73,54 @@ Uma pessoa tenta acessar uma área protegida sem enviar o cabeçalho
 | TS09  | Usuário acessa área protegida sem token.                                 | Solicitação recusada com 401; nenhuma informação protegida retornada.             |
 | TS10  | Administrador criado internamente acessa `/api/v1/areas/administrador`.  | Solicitação permitida, pois o papel é administrador.                              |
 | TS11  | Usuário realiza logout e reutiliza o token revogado.                     | Token deixa de ser aceito; resposta 401.                                          |
+
+# Prática selecionada: autenticação, autorização RBAC e menor privilégio
+
+## 5. Implementação realizada
+
+- `Role` define os perfis cliente, entregador, estabelecimento e administrador.
+- A função `current_user` exige autenticação Bearer em toda rota protegida.
+- A função `require_roles` centraliza a verificação de papéis.
+- Cada área possui uma permissão explícita; não existe autorização baseada
+  somente na URL ou no conteúdo enviado pelo navegador.
+- O administrador é criado internamente no repositório, e não por endpoint
+  público.
+- Clientes, entregadores e estabelecimentos possuem endpoints públicos de
+  cadastro, mas não podem escolher o papel de administrador.
+- Senhas são derivadas com PBKDF2-HMAC-SHA256, salt aleatório e 210.000
+  iterações.
+- Tokens são gerados com `secrets.token_urlsafe` e podem ser revogados no
+  logout.
+- As páginas HTML utilizam o backend apenas como cliente da API; a decisão de
+  autorização permanece no servidor.
+
+## 6. Resultado obtido
+
+Os testes automatizados executados em `demo/tests/test_auth_rbac.py` validam:
+
+- cadastro e login de cliente;
+- acesso permitido à área correta;
+- recusa de acesso a área de outro perfil;
+- acesso administrativo com a conta interna.
+
+Resultado da execução:
+
+```text
+3 passed
+```
+
+## 7. Referências OWASP
+
+- [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html): menor privilégio, negar por padrão, validar permissões em toda requisição e testar a lógica de autorização.
+- [OWASP API Security Top 10 — API1: Broken Object Level Authorization](https://owasp.org/API-Security/): referência para evitar acesso indevido a objetos identificados por parâmetros da API.
+- [OWASP API Security Top 10 — API5: Broken Function Level Authorization](https://owasp.org/API-Security/editions/2019/en/0xa5-broken-function-level-authorization/): referência para impedir que usuários comuns acessem funções administrativas.
+- [OWASP Insecure Direct Object Reference Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html): referência para validar a autorização do recurso solicitado.
+- [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/): padrão utilizado como base para requisitos verificáveis de autenticação e controle de acesso.
+
+## 8. Limitações da demonstração
+
+O repositório em memória e os tokens sem persistência representam uma
+simulação acadêmica. Em produção, devem ser utilizados banco de dados,
+expiração e rotação de tokens, TLS obrigatório, rate limiting, MFA para
+administradores, auditoria persistente e armazenamento externo seguro de
+segredos.
