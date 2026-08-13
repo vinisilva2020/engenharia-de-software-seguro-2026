@@ -28,6 +28,8 @@ Para cada requisito de segurança foi pesquisada uma vulnerabilidade ou categori
 
 O diagrama apresenta a organização proposta para o sistema de delivery e a posição dos principais controles relacionados aos riscos selecionados.
 
+<img width="803" height="562" alt="DiagramaArquiteturaSegura drawio" src="https://github.com/user-attachments/assets/d4f4a792-92af-412e-a0b5-ad61a258888e" />
+
 
 ## 11.3 Decisões de arquitetura
 
