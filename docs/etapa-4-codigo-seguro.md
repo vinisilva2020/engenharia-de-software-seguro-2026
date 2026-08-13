@@ -164,3 +164,90 @@ O resultado obtido demonstra que os cenários automatizados executados apresenta
 A implementação possui finalidade acadêmica e utiliza componentes simplificados.
 
 Em um ambiente de produção, seriam necessários controles adicionais, como armazenamento persistente, TLS obrigatório, expiração e rotação de tokens, autenticação multifator para contas administrativas, auditoria persistente, proteção de segredos e mecanismos adicionais de validação e monitoramento.
+
+
+
+# Prática 3 — Proteção de chamadas à API externa de pagamentos
+
+Esta prática simula a comunicação entre o backend do delivery e o serviço
+externo de pagamentos mostrado nos diagramas da arquitetura.
+
+## Riscos, requisitos e componentes
+
+| Item            | Relação                                                                |
+| --------------- | ---------------------------------------------------------------------- |
+| **R16**         | Indisponibilidade da API de pagamentos, impedindo transações.          |
+| **RS03**        | Tratamento de falhas da API externa com timeout e circuit breaker.     |
+| **T16**         | Falhas ou negação de serviço contra a API de pagamentos.               |
+| **Componentes** | Backend/API, cliente HTTP, serviço de pagamento, logs e monitoramento. |
+
+## Testes definidos antes da implementação
+
+| Teste                          | Entrada ou ação                                                          | Resultado seguro esperado                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| **TS05 — Caso válido**         | Serviço responde dentro do timeout com pedido, valor e status esperados. | Transação processada; circuito permanece `CLOSED` — **NORMAL**.                                                     |
+| **TS06 — Indisponibilidade**   | Serviço demora além do limite ou não responde.                           | Timeout encerra a chamada, retorna `503` e não expõe detalhes internos.                                             |
+| **TS07 — Falhas consecutivas** | Serviço falha três vezes seguidas.                                       | Circuito muda para `OPEN` — **BLOQUEADO** e impede novas chamadas.                                                  |
+| **TS08 — Recuperação**         | Período termina e serviço volta a responder.                             | Circuito muda para `HALF_OPEN` — **TESTANDO RECUPERAÇÃO**, permite uma chamada de teste e fecha em caso de sucesso. |
+
+## Casos de uso
+
+No caso válido, o cliente cria um pedido e o gateway responde rapidamente,
+confirmando o mesmo pedido, valor e status aprovado. O circuito permanece
+`CLOSED`.
+
+No caso inválido, o gateway ultrapassa o timeout. A chamada é encerrada, o
+backend retorna erro controlado e não expõe stack trace, URL interna ou dados do
+provedor.
+
+No caso malicioso, falhas repetidas tentam manter o backend realizando chamadas
+demoradas. Depois do limite, o circuito fica `OPEN` e bloqueia novas chamadas.
+
+## Implementação realizada
+
+`implementacao/app/services/payment_client.py` concentra a chamada HTTP, usa
+timeout de três segundos e envia chave de idempotência baseada no pedido.
+
+`implementacao/app/services/circuit_breaker.py` implementa:
+
+| Estado técnico | Nome na interface        | Comportamento                       |
+| -------------- | ------------------------ | ----------------------------------- |
+| `CLOSED`       | **NORMAL**               | Chamadas permitidas.                |
+| `OPEN`         | **BLOQUEADO**            | Chamadas recusadas imediatamente.   |
+| `HALF_OPEN`    | **TESTANDO RECUPERAÇÃO** | Uma chamada verifica a recuperação. |
+
+O limite padrão é de três falhas e o período de recuperação é de cinco
+segundos. O contador é limitado ao limiar, evitando valores como `4/3`.
+
+`implementacao/payment_api/main.py` representa o serviço externo. O arquivo
+`implementacao/payment_api/simulation.py` permite simular falha, recusa ou
+atraso. Os endpoints de simulação exigem administrador e só ficam ativos com
+`DEMO_MODE=true`:
+
+```text
+GET  /api/v1/admin/simulation/status
+POST /api/v1/admin/simulation/config
+POST /api/v1/admin/simulation/reset
+```
+
+Em ambiente real, os logs devem registrar evento, horário, pedido, duração e
+transição do circuito, sem senhas, tokens ou dados completos de cartão.
+
+## Resultado esperado
+
+```text
+Falha 1       → CLOSED / NORMAL, 1/3
+Falha 2       → CLOSED / NORMAL, 2/3
+Falha 3       → OPEN / BLOQUEADO, 3/3
+Nova chamada  → bloqueada sem consultar o gateway
+Recuperação   → HALF_OPEN / TESTANDO RECUPERAÇÃO
+Sucesso       → CLOSED / NORMAL, 0/3
+```
+
+## Referências OWASP
+
+- [OWASP API Security Top 10 — API10: Unsafe Consumption of APIs](https://owasp.org/API-Security/)
+- [OWASP Error Handling Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html)
+- [OWASP Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)
+- [OWASP Web Service Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Web_Service_Security_Cheat_Sheet.html)
+- [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/)
