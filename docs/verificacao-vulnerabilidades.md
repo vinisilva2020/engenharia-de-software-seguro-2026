@@ -73,3 +73,14 @@ CWE-693 (_Protection Mechanism Failure_) também se enquadra em **A05:2021 – S
 
 **Correção proposta:**
 Configurar o servidor/aplicação/load balancer para enviar o cabeçalho `Content-Security-Policy`, definindo explicitamente as origens permitidas para scripts, estilos, fontes, imagens e frames (ex.: `default-src 'self'`), evitando o uso de `unsafe-inline` e `unsafe-eval`.
+
+
+# Evidências e Resumo da Etapa 5
+
+**Capturas de tela salvas no repositório em `docs/evidencias/`:**
+
+1. `information-disclosure-sensitive-url.png` — alerta de exposição de dados sensíveis na URL (A01)
+2. `missing-anticlickjacking-header.png` — alerta de ausência de proteção anti-clickjacking (A02)
+3. `csp-header-not-set.png` — alerta de ausência do cabeçalho CSP (A03)
+
+**Resumo:** em uma única sessão de verificação com o OWASP ZAP contra a aplicação local (`http://127.0.0.1:8000`), foram identificados 8 alertas no total, a maioria relacionada à ausência de cabeçalhos de segurança HTTP. Dos 8, foram selecionados e detalhados os 3 alertas acima — todos originados de *scan* passivo —, cobrindo tanto exposição de dados sensíveis (CWE-598) quanto falhas de configuração de segurança (CWE-1021 e CWE-693), mapeadas respectivamente em **OWASP A02:2021** e **OWASP A05:2021**.
