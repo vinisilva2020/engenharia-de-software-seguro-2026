@@ -55,3 +55,21 @@ CWE-1021 (_Improper Restriction of Rendered UI Layers or Frames_) está associad
 
 **Correção proposta:**
 Configurar o servidor/aplicação para enviar em todas as respostas o cabeçalho `X-Frame-Options: DENY` (ou `SAMEORIGIN`, caso o _framing_ interno seja necessário) e/ou `Content-Security-Policy: frame-ancestors 'none'`.
+
+# A03 — Content Security Policy (CSP) Header Not Set
+
+**Alerta:** _Content Security Policy (CSP) Header Not Set_
+
+**Evidência:**
+
+- Requisições afetadas: `GET http://127.0.0.1:8000/cadastro`, `/cadastro (email, name, password...)`, `/login`
+- CWE ID: 693 · WASC ID: 15 · Fonte: Passivo (10038 - Content Security Policy (CSP) Header Not Set)
+
+**Impacto potencial:**
+Sem CSP, o navegador carrega scripts, estilos e outros recursos de qualquer origem, sem restrição. Isso amplia significativamente o impacto de uma vulnerabilidade de XSS ou de injeção de conteúdo: um script malicioso injetado na página pode executar livremente e carregar recursos externos (exfiltração de dados, malware, etc.), já que não existe uma lista de origens confiáveis definida pela aplicação.
+
+**Relação com OWASP/CWE:**
+CWE-693 (_Protection Mechanism Failure_) também se enquadra em **A05:2021 – Security Misconfiguration**, e reforça diretamente as defesas contra **A03:2021 – Injection** (incluindo XSS).
+
+**Correção proposta:**
+Configurar o servidor/aplicação/load balancer para enviar o cabeçalho `Content-Security-Policy`, definindo explicitamente as origens permitidas para scripts, estilos, fontes, imagens e frames (ex.: `default-src 'self'`), evitando o uso de `unsafe-inline` e `unsafe-eval`.
