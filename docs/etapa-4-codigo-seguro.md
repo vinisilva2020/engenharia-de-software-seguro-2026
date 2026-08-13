@@ -1,126 +1,166 @@
-# Prática selecionada: autenticação, autorização RBAC e menor privilégio
+# Etapa 4 — Código Seguro e Testes de Segurança
 
 ## 1. Objetivo
 
-Implementar uma API de backend para o sistema de delivery que autentique os
-usuários e verifique, no servidor, se o perfil possui permissão para acessar
-cada área da aplicação. A prática impede que a interface, a URL ou os dados
-enviados pelo cliente sejam usados para obter privilégios indevidos.
+O objetivo desta etapa é demonstrar como as decisões de segurança definidas anteriormente foram transformadas em práticas de implementação segura no sistema de delivery.
 
-O exemplo está em `implementacao/` e utiliza FastAPI, tokens Bearer, armazenamento em
-memória para fins didáticos e templates HTML para cadastro e login.
+Foram selecionadas duas práticas de código seguro:
+
+1. **Controle de autorização com RBAC e menor privilégio**;
+2. **Validação de entrada e integridade dos pedidos**.
+
+Para cada prática foram definidos testes de segurança antes da implementação, contemplando um cenário válido e um cenário malicioso, inválido ou não autorizado.
+
+---
+
+# Prática 1 — Controle de autorização com RBAC e menor privilégio
 
 ## 2. Riscos e requisitos relacionados
 
-| Item | Relação                                                                                  |
-| ---- | ---------------------------------------------------------------------------------------- |
-| R04  | Comprometimento de conta administrativa e execução de operações privilegiadas.           |
-| R11  | Exposição de dados pessoais de clientes a perfis não autorizados.                        |
-| R17  | Cliente obtém privilégios administrativos.                                               |
-| R19  | Usuário comum acessa funcionalidade reservada ao administrador.                          |
-| RS01 | O servidor deve verificar autenticação e autorização antes de operações administrativas. |
-| RS02 | O servidor deve aplicar RBAC e menor privilégio aos dados pessoais.                      |
+| Item     | Relação                                                                                              |
+| -------- | ---------------------------------------------------------------------------------------------------- |
+| **R04**  | Comprometimento de conta administrativa e execução de operações privilegiadas.                       |
+| **R11**  | Exposição de dados pessoais de clientes a perfis não autorizados.                                    |
+| **R17**  | Cliente obtém privilégios administrativos.                                                           |
+| **R19**  | Usuário comum acessa funcionalidade reservada ao administrador.                                      |
+| **RS01** | O servidor deve verificar autenticação e autorização antes da execução de operações administrativas. |
+| **RS02** | O servidor deve aplicar RBAC e menor privilégio no acesso aos dados pessoais.                        |
 
-## 3. Casos de uso
+## 3. Testes de segurança definidos antes da implementação
 
-### Caso de uso válido — cadastro e acesso do cliente
+| Teste                          | Entrada ou ação                                                                  | Resultado seguro esperado                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **TS01 — Caso válido**         | Usuário autenticado acessa uma funcionalidade correspondente ao seu perfil.      | A solicitação é permitida e somente as informações autorizadas são retornadas.                |
+| **TS02 — Caso não autorizado** | Cliente autenticado tenta acessar uma funcionalidade reservada ao administrador. | A solicitação é recusada com `403 Forbidden` e nenhuma informação administrativa é retornada. |
 
-1. O usuário informa nome, e-mail e senha com pelo menos 12 caracteres na tela
-   de cadastro.
-2. A API valida os dados e cria a conta com o papel cliente.
-3. O usuário realiza login com e-mail e senha.
-4. A API retorna um token Bearer aleatório.
-5. O cliente acessa somente a área correspondente ao seu papel.
+### Caso válido
 
-**Resultado:** a conta é criada, a senha não é armazenada em texto puro e o acesso
-à área de cliente é permitido.
+Um usuário realiza cadastro e login com credenciais válidas e tenta acessar uma funcionalidade correspondente ao seu perfil.
 
-### Caso de uso inválido — cadastro duplicado ou senha fraca
+**Resultado esperado:** o backend reconhece o usuário autenticado, verifica seu papel e permite a operação.
 
-O usuário tenta cadastrar e-mail já existente ou senha com menos de 12
-caracteres.
+### Caso não autorizado
 
-**Resultado:** a API recusa a operação com erro de validação (422) ou conflito
-(409), sem criar uma segunda conta.
+Um cliente autenticado tenta acessar uma funcionalidade administrativa ou uma área destinada a outro perfil.
 
-### Caso de uso malicioso — elevação de privilégio
+**Resultado esperado:** o backend verifica o papel do usuário e recusa a operação, impedindo a elevação indevida de privilégios.
 
-Um cliente autenticado tenta acessar `/api/v1/areas/administrador` ou altera a
-URL para acessar uma área de outro perfil.
+## 4. Implementação
 
-**Resultado:** a API verifica o papel no servidor e responde `403 Forbidden`. O
-cliente não recebe conteúdo administrativo.
+A aplicação utiliza controle de acesso baseado em papéis (**RBAC — Role-Based Access Control**) para separar as permissões de clientes, entregadores, estabelecimentos e administradores.
 
-### Caso de uso não autorizado — acesso sem autenticação
+As funcionalidades protegidas exigem autenticação por token Bearer. Após identificar o usuário, o backend verifica seu papel antes de permitir a execução da operação solicitada.
 
-Uma pessoa tenta acessar uma área protegida sem enviar o cabeçalho
-`Authorization: Bearer <token>` ou envia um token inválido.
+As regras de autorização são aplicadas no servidor. Dessa forma, modificar a interface ou alterar diretamente uma URL não permite que o usuário obtenha novas permissões.
 
-**Resultado:** a API responde `401 Unauthorized` e não executa a operação.
+O administrador é criado internamente e não existe uma opção pública que permita a clientes, entregadores ou estabelecimentos criarem contas com privilégios administrativos.
 
-## 4. Testes definidos antes da implementação
+A implementação também utiliza armazenamento seguro das senhas e permite a revogação dos tokens após o logout.
 
-| Teste | Entrada ou ação                                                          | Resultado seguro esperado                                                         |
-| ----- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| TS01  | Cliente envia cadastro válido em `/api/v1/auth/register/clientes`.       | Conta criada com papel cliente; senha armazenada somente como hash; resposta 201. |
-| TS02  | Entregador envia cadastro com senha menor que 12 caracteres.             | Cadastro recusado por validação; nenhuma conta criada; resposta 422.              |
-| TS03  | Estabelecimento tenta cadastrar um e-mail já existente.                  | Operação recusada sem sobrescrever a conta original; resposta 409.                |
-| TS04  | Usuário cadastrado informa credenciais corretas em `/api/v1/auth/login`. | Token Bearer aleatório emitido; nenhum dado sensível retornado.                   |
-| TS05  | Usuário informa senha incorreta no login.                                | Resposta genérica 401; não revelar se o e-mail existe nem emitir token.           |
-| TS06  | Cliente autenticado acessa `/api/v1/areas/cliente`.                      | Solicitação permitida; resposta limitada à área de cliente.                       |
-| TS07  | Cliente autenticado acessa `/api/v1/areas/administrador`.                | Solicitação recusada com 403; nenhuma operação administrativa executada.          |
-| TS08  | Cliente autenticado acessa `/api/v1/areas/entregador`.                   | Solicitação recusada com 403; dados e funções de entregador não expostos.         |
-| TS09  | Usuário acessa área protegida sem token.                                 | Solicitação recusada com 401; nenhuma informação protegida retornada.             |
-| TS10  | Administrador criado internamente acessa `/api/v1/areas/administrador`.  | Solicitação permitida, pois o papel é administrador.                              |
-| TS11  | Usuário realiza logout e reutiliza o token revogado.                     | Token deixa de ser aceito; resposta 401.                                          |
+## 5. Resultado esperado
 
-# Prática selecionada: autenticação, autorização RBAC e menor privilégio
+Espera-se que usuários autenticados consigam acessar somente as funcionalidades correspondentes ao seu perfil.
 
-## 5. Implementação realizada
+Tentativas de acessar funcionalidades de outro papel devem ser recusadas pelo servidor. Usuários sem autenticação válida não devem receber informações protegidas.
 
-- `Role` define os perfis cliente, entregador, estabelecimento e administrador.
-- A função `current_user` exige autenticação Bearer em toda rota protegida.
-- A função `require_roles` centraliza a verificação de papéis.
-- Cada área possui uma permissão explícita; não existe autorização baseada
-  somente na URL ou no conteúdo enviado pelo navegador.
-- O administrador é criado internamente no repositório, e não por endpoint
-  público.
-- Clientes, entregadores e estabelecimentos possuem endpoints públicos de
-  cadastro, mas não podem escolher o papel de administrador.
-- Senhas são derivadas com PBKDF2-HMAC-SHA256, salt aleatório e 210.000
-  iterações.
-- Tokens são gerados com `secrets.token_urlsafe` e podem ser revogados no
-  logout.
-- As páginas HTML utilizam o backend apenas como cliente da API; a decisão de
-  autorização permanece no servidor.
+Com isso, a aplicação aplica os princípios de menor privilégio e negação de acesso quando a autorização necessária não estiver presente.
 
-## 6. Resultado obtido
+## 6. Referências OWASP
 
-Os testes automatizados executados em `demo/tests/test_auth_rbac.py` validam:
+- **OWASP Authorization Cheat Sheet:** utilizada como referência para menor privilégio, negação por padrão e validação das permissões em cada requisição.
+- **OWASP Authentication Cheat Sheet:** utilizada como referência para autenticação segura.
+- **OWASP API Security Top 10 — Broken Function Level Authorization:** utilizada como referência para impedir que usuários comuns acessem funcionalidades administrativas.
+- **OWASP ASVS:** utilizado como base para requisitos verificáveis relacionados à autenticação e ao controle de acesso.
 
-- cadastro e login de cliente;
-- acesso permitido à área correta;
-- recusa de acesso a área de outro perfil;
-- acesso administrativo com a conta interna.
+---
 
-Resultado da execução:
+# Prática 2 — Validação de entrada e integridade dos pedidos
 
-```text
-3 passed
-```
+## 7. Riscos e requisitos relacionados
 
-## 7. Referências OWASP
+Esta prática está relacionada à ameaça identificada anteriormente de **alteração dos valores ou itens de um pedido**, na qual um cliente poderia modificar os dados enviados ao backend para tentar pagar um valor diferente do correto.
 
-- [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html): menor privilégio, negar por padrão, validar permissões em toda requisição e testar a lógica de autorização.
-- [OWASP API Security Top 10 — API1: Broken Object Level Authorization](https://owasp.org/API-Security/): referência para evitar acesso indevido a objetos identificados por parâmetros da API.
-- [OWASP API Security Top 10 — API5: Broken Function Level Authorization](https://owasp.org/API-Security/editions/2019/en/0xa5-broken-function-level-authorization/): referência para impedir que usuários comuns acessem funções administrativas.
-- [OWASP Insecure Direct Object Reference Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html): referência para validar a autorização do recurso solicitado.
-- [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/): padrão utilizado como base para requisitos verificáveis de autenticação e controle de acesso.
+| Item                        | Relação                                                                                                              |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **T05**                     | Alteração indevida de valores ou itens de um pedido.                                                                 |
+| **Risco relacionado a T05** | Manipulação dos dados do pedido para alterar preços, produtos, quantidades ou o valor total.                         |
+| **Requisito relacionado**   | O backend deve validar os dados recebidos e determinar no servidor os valores utilizados no processamento do pedido. |
 
-## 8. Limitações da demonstração
+> **Observação:** substituir “Risco relacionado a T05” e “Requisito relacionado” pelos respectivos IDs `Rxx` e `RSxx` definidos nas etapas anteriores, caso existam.
 
-O repositório em memória e os tokens sem persistência representam uma
-simulação acadêmica. Em produção, devem ser utilizados banco de dados,
-expiração e rotação de tokens, TLS obrigatório, rate limiting, MFA para
-administradores, auditoria persistente e armazenamento externo seguro de
-segredos.
+## 8. Testes de segurança definidos antes da implementação
+
+| Teste                     | Entrada ou ação                                                                            | Resultado seguro esperado                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| **TS03 — Caso válido**    | Cliente autenticado cria um pedido informando produtos e quantidades válidas.              | O servidor valida os dados e calcula o valor total utilizando os preços mantidos pela aplicação. |
+| **TS04 — Caso malicioso** | Cliente modifica a requisição e tenta informar um preço inferior ao valor real do produto. | O preço enviado pelo cliente não é utilizado e o servidor calcula o pedido com o valor correto.  |
+
+### Caso válido
+
+Um cliente autenticado cria um pedido informando o estabelecimento, os produtos desejados e suas respectivas quantidades.
+
+**Resultado esperado:** o backend valida as informações recebidas e calcula o valor total do pedido utilizando os preços controlados pelo próprio sistema.
+
+### Caso malicioso
+
+Um cliente altera os dados da requisição e tenta enviar manualmente um preço inferior ao preço real do produto.
+
+**Resultado esperado:** o backend não utiliza o preço informado pelo cliente como fonte confiável. O valor correto do produto é utilizado no cálculo do pedido.
+
+Como verificação adicional, também foi considerado o envio de um pedido sem produtos.
+
+**Resultado esperado:** a solicitação é considerada inválida e recusada antes do processamento.
+
+## 9. Implementação
+
+A criação de pedidos foi implementada considerando que informações críticas não devem ser determinadas diretamente pelo cliente.
+
+O cliente informa os produtos desejados e suas respectivas quantidades. O backend utiliza essas informações para obter os valores correspondentes e calcular o total.
+
+Dessa forma, mesmo que o cliente tente adicionar ou modificar manualmente um preço na requisição, esse valor não é utilizado para determinar o preço final.
+
+A aplicação também realiza a validação dos dados necessários para a criação do pedido. Solicitações inválidas, como pedidos sem produtos, são recusadas antes do processamento.
+
+Essa abordagem mantém no servidor a responsabilidade por informações críticas e reduz o risco de manipulação dos valores dos pedidos.
+
+## 10. Resultado esperado
+
+Espera-se que pedidos válidos sejam processados normalmente e que seus valores sejam calculados pelo backend.
+
+Tentativas de manipular os preços enviados ao servidor não devem modificar o valor real utilizado pela aplicação.
+
+Entradas inválidas devem ser recusadas antes do processamento, preservando a integridade dos dados do pedido.
+
+## 11. Referências OWASP
+
+- **OWASP Input Validation Cheat Sheet:** utilizada como referência para validação das entradas recebidas pela aplicação e rejeição de dados inválidos.
+- **OWASP Web Security Testing Guide:** utilizada como referência para testes envolvendo manipulação de parâmetros.
+- **OWASP ASVS:** utilizado como referência para requisitos verificáveis relacionados à validação das entradas e à integridade dos dados processados.
+
+---
+
+# 12. Resultado da execução dos testes
+
+Além da definição prévia dos testes de segurança, foram implementados testes automatizados para verificar o comportamento da aplicação.
+
+Os testes contemplaram cenários relacionados a autenticação, autorização, controle de acesso, validação de pedidos e tentativa de manipulação dos valores enviados pelo cliente.
+
+A execução dos testes automatizados apresentou:
+
+**13 testes aprovados e nenhuma falha.**
+
+Resultado registrado:
+
+`13 passed, 24 warnings in 1.36s`
+
+Os avisos apresentados durante a execução são provenientes de dependências utilizadas pela aplicação e não representam falhas nos testes.
+
+O resultado obtido demonstra que os cenários automatizados executados apresentaram o comportamento seguro esperado.
+
+---
+
+# 13. Limitações da demonstração
+
+A implementação possui finalidade acadêmica e utiliza componentes simplificados.
+
+Em um ambiente de produção, seriam necessários controles adicionais, como armazenamento persistente, TLS obrigatório, expiração e rotação de tokens, autenticação multifator para contas administrativas, auditoria persistente, proteção de segredos e mecanismos adicionais de validação e monitoramento.
