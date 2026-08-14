@@ -150,3 +150,79 @@ O achado do OWASP ZAP sobre informações sensíveis em URL reforça esse cuidad
 A regra busca identificar força bruta, preenchimento automatizado de credenciais ou uso de senha comprometida. A limitação deve priorizar a origem da atividade e não bloquear permanentemente a conta apenas pelas falhas, pois um atacante poderia provocar negação de serviço contra o administrador.
 
 A severidade inicial será **alta** para a sequência de falhas e **crítica** quando houver autenticação administrativa bem-sucedida após o comportamento suspeito.
+
+
+## 5. Regras de detecção
+
+### 5.1 RD01 - Tentativas suspeitas de acesso administrativo
+
+| Item | Definição |
+| --- | --- |
+| **Risco observado** | **R04 - Comprometimento de conta administrativa**, com relação adicional aos riscos R01, R02 e R03 de comprometimento de contas. |
+| **Fonte dos dados/log** | Logs do serviço de autenticação, do MFA, do Backend/API e do gerenciador de sessões. Eventos principais: falha de login, login bem-sucedido, falha de MFA, criação de sessão e revogação de token. |
+| **Condição de alerta** | Gerar alerta quando ocorrerem **5 ou mais falhas de login para a mesma conta administrativa ou originadas do mesmo IP em até 5 minutos**. Elevar a severidade se ocorrer um login administrativo bem-sucedido nos 10 minutos seguintes a 3 ou mais falhas da mesma origem. |
+| **Resposta inicial** | Aplicar limitação temporária à origem, exigir nova verificação de MFA, avisar o responsável pela conta e a equipe de segurança e preservar os identificadores das requisições. Se houve login bem-sucedido após as falhas, revogar as sessões administrativas ativas até a validação da identidade. |
+
+A regra busca identificar força bruta, preenchimento automatizado de credenciais ou uso de senha comprometida. A limitação deve priorizar a origem da atividade e não bloquear permanentemente a conta apenas pelas falhas, pois um atacante poderia provocar negação de serviço contra o administrador.
+
+A severidade inicial será **alta** para a sequência de falhas e **crítica** quando houver autenticação administrativa bem-sucedida após o comportamento suspeito.
+
+### 5.2 RD02 - Tentativas de acesso indevido a dados ou funções restritas
+
+| Item | Definição |
+| --- | --- |
+| **Risco observado** | **R11 - Exposição de dados dos clientes**, **R17 - Elevação de privilégio de cliente** e **R19 - Acesso de usuário comum a funções administrativas**. |
+| **Fonte dos dados/log** | Logs de autorização do Backend/API, respostas 401 e 403, trilha de auditoria de acesso a dados pessoais e registros de consulta do banco de dados. Eventos principais: acesso recusado, acesso a dado pessoal e chamada de endpoint administrativo. |
+| **Condição de alerta** | Gerar alerta quando a mesma conta ou sessão produzir **3 ou mais recusas de autorização em até 10 minutos** ao tentar acessar endpoints administrativos ou dados de terceiros. Também gerar alerta quando uma conta consultar **5 ou mais registros de clientes sem relação com pedido, entrega ou chamado autorizado em até 5 minutos**. |
+| **Resposta inicial** | Interromper ou revogar a sessão suspeita, aplicar bloqueio temporário, preservar os registros correlacionados e verificar se algum dado foi efetivamente retornado. Confirmar se a conta foi comprometida e, em caso de exposição, acionar o responsável pela proteção de dados e o processo de resposta a incidentes. |
+
+A regra detecta tentativas de alterar identificadores de recursos, enumerar dados de clientes ou acessar funções incompatíveis com o perfil. Contas de suporte e administração também devem possuir justificativa de negócio, como um chamado ou operação autorizada, para consultas em sequência.
+
+A severidade inicial será **alta** quando os controles recusarem todas as tentativas e **crítica** se a análise confirmar que informações protegidas foram retornadas ou exportadas.
+
+### 5.3 RD03 - Sobrecarga ou negação de serviço contra a aplicação
+
+| Item | Definição |
+| --- | --- |
+| **Risco observado** | **R15 - Indisponibilidade da aplicação por Denial of Service**. |
+| **Fonte dos dados/log** | Logs do API Gateway ou WAF, registros de rate limiting, métricas do Backend/API, códigos HTTP, latência, uso de CPU e memória e monitoramento de disponibilidade. |
+| **Condição de alerta** | Gerar alerta quando uma mesma origem ou token ultrapassar **120 requisições por minuto durante 2 minutos consecutivos**. Para ataques distribuídos, gerar alerta quando o volume agregado permanecer acima de **3 vezes a média móvel dos 30 minutos anteriores durante 5 minutos** e, simultaneamente, a taxa de erros 5xx superar 10% ou a latência aumentar de forma anormal. |
+| **Resposta inicial** | Aplicar ou reforçar rate limiting, bloquear temporariamente origens claramente maliciosas, ativar o mecanismo de mitigação de DDoS e ajustar a capacidade quando necessário. Preservar amostras dos registros e acompanhar erros e latência para confirmar a recuperação sem interromper usuários legítimos. |
+
+A combinação entre volume, duração, erros e latência reduz falsos positivos provocados por horários de pico ou campanhas legítimas. A severidade será **alta** quando houver tentativa de sobrecarga sem impacto relevante e **crítica** quando a disponibilidade ou a conclusão de pedidos for afetada.
+
+## 6. O que acontece após um alerta
+
+Após a geração de um alerta, o grupo responsável pelo monitoramento deve seguir um fluxo de resposta consistente:
+
+1. **Recebimento e correlação:** reunir os eventos relacionados pelo usuário, IP, sessão, recurso, horário e identificador de requisição.
+2. **Triagem:** verificar se a condição da regra foi atendida, eliminar duplicidades e analisar a possibilidade de falso positivo.
+3. **Classificação:** definir a severidade conforme o ativo afetado, o perfil envolvido, a quantidade de usuários atingidos e a existência de acesso ou dano confirmado.
+4. **Contenção inicial:** executar a resposta prevista na regra, como limitar requisições, revogar sessão, bloquear origem ou restringir temporariamente uma operação.
+5. **Preservação de evidências:** proteger logs, horários, identificadores e demais registros necessários para reconstruir o evento, evitando alterações no material original.
+6. **Investigação:** determinar a origem, o alcance, as contas e os dados afetados, a vulnerabilidade explorada e a duração da atividade.
+7. **Comunicação e escalonamento:** avisar infraestrutura, desenvolvimento, administração, responsável pela proteção de dados ou provedor externo conforme a natureza do incidente.
+8. **Erradicação e recuperação:** corrigir a causa, remover acessos indevidos, restaurar o serviço ou os dados e acompanhar o ambiente até a normalização.
+9. **Lições aprendidas:** registrar o incidente, avaliar a eficácia da resposta e ajustar controles, limites e regras de detecção.
+
+Ações permanentes contra uma conta ou usuário não devem ser tomadas somente com base em um alerta automático. A confirmação humana e a análise do contexto reduzem o risco de bloquear usuários legítimos ou de interpretar uma falha operacional como ataque.
+
+## 7. Responsabilidades e evidências
+
+| Responsável | Atuação principal |
+| --- | --- |
+| **Infraestrutura/monitoramento** | Receber alertas, correlacionar métricas, conter sobrecarga e preservar registros técnicos. |
+| **Desenvolvimento** | Analisar falhas da aplicação, corrigir vulnerabilidades e validar os controles de autenticação e autorização. |
+| **Administração da plataforma** | Confirmar operações privilegiadas, apoiar o bloqueio de contas e decidir sobre a continuidade do serviço. |
+| **Responsável pela proteção de dados** | Avaliar incidentes com possível exposição de informações pessoais e orientar as comunicações necessárias. |
+| **Provedores externos** | Apoiar a investigação e recuperação quando pagamento, autenticação, nuvem ou outro serviço integrado estiver envolvido. |
+
+Como evidência da Etapa 6, o repositório deverá manter este roteiro, o histórico de commits dos integrantes e a relação entre as regras RD01 a RD03 e os riscos R04, R11, R17, R19 e R15 já registrados nas etapas anteriores.
+
+## 8. Considerações finais
+
+A proposta combina registros de autenticação, autorização, acesso a dados, operações do delivery e disponibilidade para identificar comportamentos suspeitos. As três regras priorizam o comprometimento administrativo, o acesso indevido a informações e a negação de serviço, situações com impacto alto ou crítico para o sistema.
+
+Os limites apresentados são valores iniciais para o roteiro acadêmico. Em um ambiente real, eles devem ser ajustados com base no volume normal de uso, nos horários de pico, nos falsos positivos observados e nas características da infraestrutura. A detecção somente será eficaz se os logs forem completos, protegidos, sincronizados e acompanhados por um processo definido de resposta.
+
+
