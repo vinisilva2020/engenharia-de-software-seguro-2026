@@ -74,3 +74,42 @@ Como não é necessária a implementação real do pipeline, as ferramentas repr
 As ferramentas propostas cobrem diferentes momentos do pipeline, desde o versionamento e os testes automatizados até a análise estática, análise de dependências, identificação de segredos, testes dinâmicos e monitoramento.
 
 A combinação dessas verificações permite identificar problemas de segurança antes da implantação e acompanhar possíveis eventos de segurança durante a operação.
+
+# Roteiro do Vídeo Final — Verificação e DevSecOps
+
+## Principais resultados da verificação
+
+Apresentar a utilização do **OWASP ZAP** e os principais resultados encontrados durante a verificação de segurança, destacando os alertas mais relevantes.
+
+## Regras de detecção
+
+Apresentar regras como:
+
+- tentativas repetidas de autenticação;
+- acesso administrativo sem autorização;
+- operações administrativas suspeitas;
+- falhas recorrentes no serviço de pagamentos.
+
+Explicar como logs e alertas auxiliam na identificação de possíveis incidentes.
+
+## Pipeline DevSecOps
+
+Apresentar o fluxo:
+
+**Planejamento → Requisitos e Arquitetura → Implementação Segura → Testes Automatizados → Testes de Pagamento → Análise de Código e Dependências → OWASP ZAP → Implantação → Monitoramento → Resposta.**
+
+Destacar que os **gates de segurança** impedem o avanço quando existem vulnerabilidades críticas, testes reprovados, segredos expostos, falhas de controle de acesso ou falhas críticas na integração com pagamentos.
+
+## Aprendizados
+
+A segurança deve acompanhar todo o ciclo de desenvolvimento.
+
+As ameaças identificadas deram origem aos riscos, que orientaram os requisitos e as decisões de arquitetura. Essas decisões foram aplicadas na implementação, verificadas por testes e integradas ao pipeline DevSecOps.
+
+O projeto demonstrou que a segurança não é apenas uma etapa final, mas um processo contínuo durante todo o ciclo de vida do software.
+
+## Participação do grupo
+
+Todos os integrantes participarão do vídeo, dividindo a apresentação conforme as etapas desenvolvidas durante o projeto.
+
+O vídeo destacará as principais decisões e a evolução do sistema, sem necessidade de apresentar todas as tabelas produzidas.
