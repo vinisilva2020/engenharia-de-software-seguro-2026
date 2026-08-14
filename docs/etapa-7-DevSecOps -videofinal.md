@@ -24,3 +24,35 @@ Figura 1 — Pipeline DevSecOps proposto para o Sistema de Delivery
 O fluxo possui pontos de controle, chamados de **gates de segurança**, responsáveis por impedir que uma versão avance quando alguma condição de segurança considerada obrigatória não for atendida.
 
 No caso do serviço de pagamentos, os testes de integração devem considerar situações como indisponibilidade do gateway, timeout, repetição de requisições e prevenção de operações duplicadas, de acordo com o risco **R16**, o requisito **RS03** e a decisão arquitetural **DA03**.
+
+# Atividades e Gates de Segurança
+
+## Atividades, Evidências e Condições do Pipeline
+
+| **Momento** | **Atividade de segurança** | **Evidência produzida** | **Condição para continuar** |
+| --- | --- | --- | --- |
+| **Planejamento** | STRIDE, casos de abuso e análise de riscos | Tabela de ameaças, casos de abuso e registro de riscos | Riscos prioritários identificados e analisados |
+| **Arquitetura** | Definição dos requisitos RS01, RS02 e RS03 e das decisões DA01, DA02 e DA03 | Requisitos de segurança e diagrama de arquitetura segura | Controles definidos para os riscos prioritários |
+| **Implementação** | Aplicação de práticas de código seguro | Código, pseudocódigo e implementação dos controles | Práticas de segurança implementadas |
+| **Testes** | Testes automatizados de autenticação, autorização, RBAC e menor privilégio | Resultado dos testes automatizados | Testes obrigatórios aprovados |
+| **Pagamentos** | Testes de integração com o serviço de pagamentos | Resultados dos testes de integração e cenários de falha | Sem inconsistência no pedido ou duplicidade de operações |
+| **Análise de código** | SAST e Secret Scanning | Relatório das análises | Sem vulnerabilidade crítica não analisada ou segredo exposto |
+| **Dependências** | SCA para identificação de componentes vulneráveis | Relatório de dependências | Sem dependência crítica conhecida sem tratamento |
+| **Verificação** | Teste dinâmico com OWASP ZAP | Relatório de alertas da ferramenta | Achados críticos analisados |
+| **Implantação** | Liberação da versão que passou pelos gates de segurança | Registro da versão aprovada | Verificações obrigatórias aprovadas |
+| **Operação** | Logs, eventos e regras de detecção | Logs, alertas e registros de segurança | Eventos suspeitos analisados |
+| **Resposta** | Investigação, contenção e correção de incidentes | Registro do incidente e das ações realizadas | Incidente tratado e melhoria incorporada ao ciclo |
+
+## Condições que Impedem a Continuidade do Pipeline
+
+O pipeline deve impedir que uma versão avance quando uma condição de segurança obrigatória não for atendida.
+
+1. **Teste automatizado ou teste de segurança reprovado.** Caso um teste obrigatório apresente falha, a versão deve retornar para correção antes de continuar.
+2. **Vulnerabilidade crítica não analisada.** Uma vulnerabilidade crítica deve ser analisada e tratada ou possuir justificativa documentada.
+3. **Segredo encontrado no repositório.** Senhas, tokens, chaves de API e credenciais não devem permanecer diretamente no código ou repositório.
+4. **Dependência com vulnerabilidade crítica conhecida.** Uma dependência crítica conhecida e sem tratamento impede o avanço.
+5. **Falha no controle de acesso.** Um cliente, por exemplo, não pode acessar funcionalidades exclusivas do administrador.
+6. **Falha crítica na integração com pagamentos.** Cobrança duplicada, inconsistência no pedido ou tratamento inadequado da indisponibilidade impedem o avanço.
+
+Após a correção do problema identificado, as verificações devem ser executadas novamente.
+
