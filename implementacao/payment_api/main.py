@@ -12,6 +12,8 @@ from secrets import token_urlsafe
 
 from fastapi import FastAPI, Header, HTTPException, status
 from pydantic import BaseModel, Field
+import time
+from payment_api.simulation import state
 
 
 class PaymentStatus(StrEnum):
@@ -81,6 +83,9 @@ def create_payment(
         raise HTTPException(400, "O cabeçalho Idempotency-Key é obrigatório")
     if len(idempotency_key) > 128:
         raise HTTPException(400, "Idempotency-Key excede o tamanho permitido")
+    if state.latency: time.sleep(state.latency)
+    if state.failure: raise HTTPException(503, "Payment API indisponível")
+    if state.rejection: raise HTTPException(402, "Pagamento recusado")
 
     existing_id = IDEMPOTENCY_INDEX.get(idempotency_key)
     if existing_id is not None:

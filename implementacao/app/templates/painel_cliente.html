@@ -44,7 +44,7 @@
         <section class="painel-acoes">
           <p class="kicker">Atalhos rápidos</p>
           <div class="acoes-grade">
-            <button class="botao botao--fosco" type="button">Novo pedido</button>
+            <button class="botao botao--fosco" id="novo-pedido" type="button">Novo pedido</button>
             <button class="botao botao--fosco" type="button">Histórico</button>
             <button class="botao botao--fosco" type="button">Avaliações</button>
           </div>
@@ -102,6 +102,11 @@
         });
         localStorage.removeItem("token");
         location.href = "/login";
+      };
+
+      // O painel usa navegação explícita para a tela real de montagem do pedido.
+      document.getElementById("novo-pedido").onclick = () => {
+        window.location.assign("/pedido");
       };
 
       iniciar();

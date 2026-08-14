@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Demonstração de pedido</title><link rel="stylesheet" href="/static/css/styles.css"></head>
+<body>
+<header class="masthead"><a class="marca" href="/"><span class="marca-selo"></span><span>Delivery Seguro</span></a><a class="link-nav" href="/">Início</a></header>
+<main class="conteudo pedido-pagina">
+  <section class="pedido-intro"><p class="kicker">Laboratório de segurança</p><h1>🍔 Pedido protegido</h1><p>Esta tela demonstra como a API reage quando o serviço externo de pagamentos está indisponível.</p></section>
+  <section class="falha-fixa" aria-live="polite">
+    <div class="falha-fixa__top"><span class="status-dot"></span><div><p class="kicker">Cenário ativo</p><h2>Falha fixa no serviço de pagamentos</h2></div></div>
+    <p>O gateway simulado responderá com erro em todas as chamadas. O backend aplica timeout, registra a falha e abre o circuit breaker após três tentativas.</p>
+    <div class="circuit-readout"><span id="circuit-label">Consultando circuito…</span><span>Falhas <b id="failures">0</b>/<b id="threshold">3</b></span><span id="last-update">Atualizando…</span></div>
+  </section>
+  <div id="access-message" class="alerta alerta--erro" hidden></div>
+  <section class="order-layout">
+    <div class="catalog-panel"><div class="section-heading"><span>🏪</span><div><p class="kicker">Catálogo confiável</p><h2>Escolha seu estabelecimento</h2></div></div><label class="campo"><span>Estabelecimento</span><select id="establishment"></select></label><section class="menu-grid" id="menu"></section></div>
+    <aside class="cart-card"><div class="section-heading"><span>🛒</span><div><p class="kicker">Carrinho</p><h2>Seu pedido</h2></div></div><ul id="cart"></ul><div class="cart-total"><span>Total calculado</span><strong>R$ <span id="total">0,00</span></strong></div><button class="botao botao--bloco" id="finish" type="button">🔒 Enviar pedido</button><p id="message" class="demo-event"></p></aside>
+  </section>
+  <section class="request-guide"><p class="kicker">O que observar no navegador</p><p>Abra DevTools → Network. A primeira tentativa chega ao serviço de pagamentos e falha. Depois que o circuito abrir, novas tentativas retornam <b>503</b> imediatamente, sem nova chamada externa.</p></section>
+</main>
+<script>
+const cart=[];const $=id=>document.getElementById(id);const token=localStorage.getItem('token');
+async function api(url,options={}){options.headers={...(options.headers||{}),Authorization:`Bearer ${token}`};const r=await fetch(url,options);const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.detail||`Erro HTTP ${r.status}`);return b;}
+function renderCart(){ $('cart').innerHTML=cart.length?cart.map((x,i)=>`<li><span>${x.name}<small> × ${x.quantity}</small></span><button class="remove-item" onclick="removeItem(${i})" aria-label="Remover item">Remover</button></li>`).join(''):'<li class="empty-cart">Adicione um item para começar.</li>';$('total').textContent=cart.reduce((s,x)=>s+x.price*x.quantity,0).toFixed(2).replace('.',',');}function removeItem(i){cart.splice(i,1);renderCart();}window.removeItem=removeItem;
+async function loadMenu(){const items=await api(`/api/v1/establishments/${$('establishment').value}/menu`);$('menu').innerHTML=items.map(x=>`<article class="menu-item"><div class="menu-item__icon">🍽️</div><div class="menu-item__body"><h3>${x.name}</h3><p>${x.description}</p><b>R$ ${x.price.toFixed(2).replace('.',',')}</b></div><button class="botao botao--pequeno" onclick='add(${JSON.stringify(x)})'>Adicionar</button></article>`).join('');}
+function add(x){const item=cart.find(i=>i.product_id===x.id);if(item)item.quantity++;else cart.push({product_id:x.id,quantity:1,name:x.name,price:x.price});renderCart();}window.add=add;
+function showCircuit(s){const state=s.circuit_breaker.state;const labels={CLOSED:'CLOSED · aguardando falhas',OPEN:'OPEN · chamadas bloqueadas',HALF_OPEN:'HALF_OPEN · testando recuperação'};$('circuit-label').textContent=labels[state]||state;$('circuit-label').className='circuit-state circuit-'+state.toLowerCase();$('failures').textContent=s.circuit_breaker.failures;$('threshold').textContent=s.circuit_breaker.threshold;$('last-update').textContent='Atualizado agora';}
+async function refreshCircuit(){try{showCircuit(await api('/api/v1/demo/simulation/status'));}catch(e){$('last-update').textContent='Não foi possível consultar';}}
+(async()=>{try{const list=await api('/api/v1/establishments');$('establishment').innerHTML=list.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');$('establishment').onchange=loadMenu;await loadMenu();renderCart();await refreshCircuit();setInterval(refreshCircuit,1000);}catch(e){$('access-message').hidden=false;$('access-message').textContent=e.message;}})();
+$('finish').onclick=async()=>{if(!cart.length){$('message').textContent='Adicione pelo menos um item.';return;}$('message').textContent='Enviando pedido…';try{const d=await api('/api/v1/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({establishment_id:Number($('establishment').value),items:cart.map(x=>({product_id:x.product_id,quantity:x.quantity}))})});$('message').textContent=`Pedido #${d.id} aprovado.`;cart.length=0;renderCart();}catch(e){$('message').textContent=`🛡️ ${e.message}`;await refreshCircuit();}};
+</script></body></html>

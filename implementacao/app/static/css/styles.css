@@ -603,3 +603,21 @@ select {
     gap: 0.3rem;
   }
 }
+
+/* Tela de pedido e laboratório visual do circuit breaker. */
+.pedido-intro { max-width: 700px; margin-bottom: 2rem; }
+.pedido-intro p:last-child { color: var(--tinta-suave); }
+.demo-card, .cart-card { background: var(--superficie); border: 1px solid var(--traco); padding: 1.35rem; }
+.demo-card { border-left: 4px solid var(--acento); margin-bottom: 2rem; }
+.demo-card__heading { display: flex; gap: 1rem; align-items: center; }.demo-card__heading h2 { margin: 0; font-size: 1.25rem; }.demo-icon { font-size: 1.8rem; }
+.demo-card > p { color: var(--tinta-suave); margin: .7rem 0; }.circuit-metrics { display: flex; gap: 1.2rem; flex-wrap: wrap; border-top: 1px solid var(--traco); border-bottom: 1px solid var(--traco); padding: .7rem 0; font-size: .82rem; }.demo-actions { display: flex; gap: .7rem; flex-wrap: wrap; margin-top: 1rem; }.demo-event { color: var(--tinta-suave); font-size: .85rem; margin-bottom: 0; }
+.state-open { color: var(--acento); }.state-half_open { color: #9b731e; }.state-closed { color: var(--ok); }
+.order-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1.4rem; }.menu-grid { display: grid; gap: .8rem; margin-top: 1.4rem; }.menu-item { display: grid; grid-template-columns: 42px 1fr auto; gap: .8rem; align-items: center; background: var(--superficie); border: 1px solid var(--traco); padding: 1rem; }.menu-item__icon { font-size: 1.5rem; text-align: center; }.menu-item h3 { font-family: var(--fonte-titulo); margin: 0; font-size: 1rem; }.menu-item p { color: var(--tinta-suave); font-size: .84rem; margin: .2rem 0; }.menu-item b { color: var(--acento); }
+.cart-card { height: max-content; position: sticky; top: 1rem; }.cart-card ul { list-style: none; padding: 0; margin: 0 0 1rem; }.cart-card li { display: flex; justify-content: space-between; gap: .6rem; padding: .65rem 0; border-bottom: 1px solid var(--traco); font-size: .9rem; }.cart-card small { color: var(--tinta-suave); }.empty-cart { color: var(--tinta-suave); }.remove-item { border: 0; background: transparent; color: var(--acento); cursor: pointer; font-size: 1.2rem; }.cart-total { display: flex; justify-content: space-between; margin: 1rem 0; font-family: var(--fonte-titulo); }
+@media (max-width: 780px) { .order-layout { grid-template-columns: 1fr; }.cart-card { position: static; }.menu-item { grid-template-columns: 36px 1fr; }.menu-item .botao { grid-column: 2; justify-self: start; } }
+
+/* Ajustes da demonstração: hierarquia simples e leitura confortável. */
+.falha-fixa { background: #fff8f2; border: 1px solid #e2b69d; border-left: 5px solid var(--acento); padding: 1.25rem 1.4rem; margin-bottom: 1.8rem; }
+.falha-fixa__top, .section-heading { display: flex; align-items: center; gap: .8rem; }.falha-fixa h2, .section-heading h2 { margin: 0; font-size: 1.15rem; }.falha-fixa p:not(.kicker) { color: var(--tinta-suave); margin: .8rem 0; }.status-dot { width: 13px; height: 13px; border-radius: 50%; background: var(--acento); box-shadow: 0 0 0 5px rgba(173,91,49,.12); flex: none; }
+.circuit-readout { display: flex; align-items: center; gap: 1.3rem; flex-wrap: wrap; border-top: 1px solid #e2b69d; padding-top: .8rem; font-size: .82rem; }.circuit-state { font-family: var(--fonte-titulo); font-weight: 700; }.circuit-open { color: var(--acento); }.circuit-half_open { color: #9b731e; }.circuit-closed { color: var(--ok); }
+.catalog-panel { min-width: 0; }.section-heading { margin-bottom: 1.2rem; }.section-heading > span { font-size: 1.5rem; }.menu-item__body { min-width: 0; }.menu-item__body h3 { overflow-wrap: anywhere; }.cart-card h2 { font-size: 1.15rem; }.remove-item { font-size: .75rem; text-decoration: underline; }.request-guide { margin-top: 2rem; padding: 1rem 1.2rem; border-top: 1px solid var(--traco); color: var(--tinta-suave); font-size: .88rem; }.request-guide p { margin: .2rem 0; }

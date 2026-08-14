@@ -18,3 +18,17 @@ class PublicUser(BaseModel):
     name: str
     email: EmailStr
     role: str
+
+
+class OrderItemRequest(BaseModel):
+    """Item recebido do cliente; o preço nunca é aceito da requisição."""
+
+    product_id: int
+    quantity: int = Field(ge=1, le=20)
+
+
+class OrderRequest(BaseModel):
+    """Pedido mínimo para criação do carrinho no servidor."""
+
+    establishment_id: int
+    items: list[OrderItemRequest] = Field(min_length=1)
