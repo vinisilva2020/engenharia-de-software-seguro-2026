@@ -19,7 +19,7 @@ O pipeline DevSecOps proposto segue o fluxo:
 **Planejamento e análise de ameaças → Requisitos e arquitetura → Implementação segura → Testes automatizados → Testes de pagamento → Análise de código e dependências → Gate de segurança → Teste dinâmico com OWASP ZAP → Gate final → Implantação → Monitoramento e detecção → Resposta a incidentes → Feedback contínuo.**
 
 Figura 1 — Pipeline DevSecOps proposto para o Sistema de Delivery
-![Pipeline DevSecOps proposto para o Sistema de Delivery](diagramas/imagens/pipeline.png)
+![Pipeline DevSecOps proposto para o Sistema de Delivery](../diagramas/imagens/pipeline.png)
 
 O fluxo possui pontos de controle, chamados de **gates de segurança**, responsáveis por impedir que uma versão avance quando alguma condição de segurança considerada obrigatória não for atendida.
 
