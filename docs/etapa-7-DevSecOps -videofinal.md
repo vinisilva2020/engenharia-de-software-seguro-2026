@@ -56,3 +56,21 @@ O pipeline deve impedir que uma versão avance quando uma condição de seguran�
 
 Após a correção do problema identificado, as verificações devem ser executadas novamente.
 
+# Ferramentas Propostas para o Pipeline DevSecOps
+
+Como não é necessária a implementação real do pipeline, as ferramentas representam tecnologias que poderiam ser utilizadas para automatizar as verificações propostas.
+
+| **Atividade** | **Ferramenta sugerida** | **Finalidade** |
+| --- | --- | --- |
+| Versionamento | Git e GitHub | Versionamento do código e revisão das alterações |
+| Testes automatizados | Pytest | Execução dos testes do backend |
+| SAST | CodeQL ou Semgrep | Identificação de possíveis vulnerabilidades no código |
+| SCA | Dependabot ou OWASP Dependency-Check | Identificação de dependências com vulnerabilidades conhecidas |
+| Secret Scanning | Gitleaks | Identificação de senhas, tokens e chaves expostas |
+| Testes de pagamento | Sandbox do provedor | Simulação da integração com o serviço de pagamentos |
+| DAST | OWASP ZAP | Verificação da aplicação durante sua execução |
+| Monitoramento | Logs e alertas da aplicação | Identificação de eventos e comportamentos suspeitos |
+
+As ferramentas propostas cobrem diferentes momentos do pipeline, desde o versionamento e os testes automatizados até a análise estática, análise de dependências, identificação de segredos, testes dinâmicos e monitoramento.
+
+A combinação dessas verificações permite identificar problemas de segurança antes da implantação e acompanhar possíveis eventos de segurança durante a operação.
