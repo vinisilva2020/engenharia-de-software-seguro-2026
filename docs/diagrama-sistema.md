@@ -330,6 +330,8 @@ A API / Servidor representa um componente central e um ponto importante de prote
 Da mesma forma, a separação entre Aplicativo Cliente, Painel Estabelecimento, Aplicativo Entregador e Painel Administrativo permite visualizar que diferentes perfis possuem diferentes necessidades de acesso.
 
 Assim, o Diagrama Simplificado de Componentes complementa as demais representações ao demonstrar como os principais elementos do Sistema Delivery estão organizados e como se comunicam. A combinação entre os diagramas permite analisar o sistema em diferentes níveis, facilitando a identificação de componentes críticos, pontos de entrada, integrações externas e possíveis superfícies de ataque.
+
+
 <img width="832" height="482" alt="Diagradecomponente drawio" src="https://github.com/user-attachments/assets/18668d1e-7914-4099-89f5-7e34b42dcdbe" />
 
 
